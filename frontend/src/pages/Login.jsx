@@ -1,25 +1,35 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 
 export default function Login() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [perfil, setPerfil] = useState('Aluno'); // Padrão inicial
   const [erro, setErro] = useState('');
 
   const handleLogin = async (e) => {
+
     e.preventDefault();
     setErro('');
 
     try {
       // Dispara a requisição POST para o Express
       const resposta = await api.post('/auth/login', { email, senha, perfil });
-      
+
       // Salva o token ou dados do usuário localmente no navegador
       localStorage.setItem('@JJTrack:usuario', JSON.stringify(resposta.data));
+
+      //redirecionamento para a página correta com base no perfil do usuário
+      const usuarioLogado = resposta.data;
+
+      if (usuarioLogado.perfil === 'Professor') {
+        navigate('/professor');
+      } else {
+        navigate('/aluno');
+      }
       
-      alert(`Bem-vindo, ${resposta.data.nome}! Login realizado com sucesso.`);
-      // Aqui depois faremos o redirecionamento para a Dashboard
     } catch (err) {
       setErro(err.response?.data?.error || 'Erro ao tentar realizar o login.');
     }
