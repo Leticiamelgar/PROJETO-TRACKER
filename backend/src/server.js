@@ -23,6 +23,10 @@ app.get('/api/teste-banco', async (req, res) => {
     }
 });
 
+const authRoutes = require('./routes/authRoutes');
+app.use('/api/auth', authRoutes);
+
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Servidor Express rodando com sucesso na porta ${PORT}`);
