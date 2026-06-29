@@ -2,9 +2,9 @@ const express = require("express");
 const router = express.Router();
 const db = require("../config/db");
 
+// ROTA PARA LISTAR
 router.get("/listar", async (req, res) => {
   try {
-    // O JOIN junta a tabela usuarios com a tabela alunos para trazer todos os dados
     const query = `
             SELECT u.id, u.nome, u.email, 
                    a.data_nascimento, a.data_ultima_graduacao, a.faixa, a.grau, a.genero
@@ -21,14 +21,13 @@ router.get("/listar", async (req, res) => {
   }
 });
 
+// ROTA PARA CADASTRAR NOVO ALUNO
 router.post("/cadastrar", async (req, res) => {
-  // 1. Recebe tudo do Front-End
   const { nome, email, dataNascimento, ultimaGraduacao, faixa, grau, genero } =
     req.body;
   const senhaPadrao = "123456";
 
   try {
-    // Verifica se o e-mail já existe
     const checkEmail = await db.query(
       "SELECT * FROM usuarios WHERE email = $1",
       [email],
@@ -37,7 +36,6 @@ router.post("/cadastrar", async (req, res) => {
       return res.status(400).json({ error: "Este e-mail já está cadastrado." });
     }
 
-    // 2. INSERE NA TABELA USUARIOS (e pega o ID de volta)
     const userResult = await db.query(
       "INSERT INTO usuarios (nome, email, senha, perfil) VALUES ($1, $2, $3, $4) RETURNING id",
       [nome, email, senhaPadrao, "Aluno"],
@@ -45,7 +43,6 @@ router.post("/cadastrar", async (req, res) => {
 
     const novoUsuarioId = userResult.rows[0].id;
 
-    // 3. INSERE NA TABELA ALUNOS (usando o ID gerado acima)
     await db.query(
       `INSERT INTO alunos (usuario_id, data_nascimento, data_ultima_graduacao, faixa, grau, genero) 
              VALUES ($1, $2, $3, $4, $5, $6)`,
@@ -56,6 +53,53 @@ router.post("/cadastrar", async (req, res) => {
   } catch (error) {
     console.error("Erro ao cadastrar aluno:", error);
     res.status(500).json({ error: "Erro interno ao cadastrar." });
+  }
+});
+
+// ROTA PARA EXCLUIR
+router.delete("/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // 1º Deletamos da tabela dependente (alunos)
+    await db.query("DELETE FROM alunos WHERE usuario_id = $1", [id]);
+
+    // 2º Deletamos da tabela principal (usuarios)
+    await db.query("DELETE FROM usuarios WHERE id = $1", [id]);
+
+    res.json({ mensagem: "Aluno removido com sucesso!" });
+  } catch (error) {
+    console.error("Erro ao excluir aluno:", error);
+    res.status(500).json({ error: "Erro ao excluir aluno no banco de dados." });
+  }
+});
+
+// ROTA PARA EDITAR (ATUALIZAR)
+router.put("/:id", async (req, res) => {
+  const { id } = req.params;
+  const { nome, email, dataNascimento, ultimaGraduacao, faixa, grau, genero } =
+    req.body;
+
+  try {
+    // Atualiza os dados básicos do usuário
+    await db.query("UPDATE usuarios SET nome = $1, email = $2 WHERE id = $3", [
+      nome,
+      email,
+      id,
+    ]);
+
+    // Atualiza os dados específicos de jiu-jitsu
+    await db.query(
+      `UPDATE alunos 
+             SET data_nascimento = $1, data_ultima_graduacao = $2, faixa = $3, grau = $4, genero = $5 
+             WHERE usuario_id = $6`,
+      [dataNascimento, ultimaGraduacao, faixa, grau, genero, id],
+    );
+
+    res.json({ mensagem: "Dados do aluno atualizados com sucesso!" });
+  } catch (error) {
+    console.error("Erro ao atualizar aluno:", error);
+    res.status(500).json({ error: "Erro ao atualizar dados." });
   }
 });
 

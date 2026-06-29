@@ -17,10 +17,12 @@ export default function Alunos() {
   const [grau, setGrau] = useState("");
   const [genero, setGenero] = useState("");
 
+  // Estado para controlar se estamos editando um aluno (guarda o ID dele)
+  const [editandoId, setEditandoId] = useState(null);
+
   // Estado da lista de alunos
   const [listaAlunos, setListaAlunos] = useState([]);
 
-  // Busca os alunos na API
   const fetchAlunos = async () => {
     try {
       const response = await api.get("/alunos/listar");
@@ -30,7 +32,6 @@ export default function Alunos() {
     }
   };
 
-  // Carrega a lista ao abrir a tela
   useEffect(() => {
     fetchAlunos();
   }, []);
@@ -40,39 +41,87 @@ export default function Alunos() {
     navigate("/");
   };
 
-  const handleCadastrar = async (e) => {
+  // Limpa o formulário e sai do modo de edição
+  const limparFormulario = () => {
+    setNome("");
+    setEmail("");
+    setDataNascimento("");
+    setUltimaGraduacao("");
+    setFaixa("");
+    setGrau("");
+    setGenero("");
+    setEditandoId(null);
+  };
+
+  // Função unificada para Salvar Novo Cadastro ou Salvar Alterações
+  const handleSalvar = async (e) => {
     e.preventDefault();
 
+    const dadosAluno = {
+      nome,
+      email,
+      dataNascimento,
+      ultimaGraduacao,
+      faixa,
+      grau,
+      genero,
+    };
+
     try {
-      await api.post("/alunos/cadastrar", {
-        nome,
-        email,
-        dataNascimento,
-        ultimaGraduacao,
-        faixa,
-        grau,
-        genero,
-      });
+      if (editandoId) {
+        // Modo Edição
+        await api.put(`/alunos/${editandoId}`, dadosAluno);
+        alert("Alterações salvas com sucesso!");
+      } else {
+        // Modo Cadastro Novo
+        await api.post("/alunos/cadastrar", dadosAluno);
+        alert("Aluno cadastrado com sucesso! A senha padrão é 123456.");
+      }
 
-      alert("Aluno cadastrado com sucesso no tatame! A senha padrão é 123456.");
-
-      // Limpa os campos
-      setNome("");
-      setEmail("");
-      setDataNascimento("");
-      setUltimaGraduacao("");
-      setFaixa("");
-      setGrau("");
-      setGenero("");
-
-      // Atualiza a lista exibida nas colunas
+      limparFormulario();
       fetchAlunos();
     } catch (err) {
-      alert(err.response?.data?.error || "Erro ao cadastrar aluno.");
+      alert(err.response?.data?.error || "Erro ao processar a requisição.");
     }
   };
 
-  // Helpers para formatar dados e calcular idade
+  // Função de Excluir com confirmação
+  const handleExcluir = async (id) => {
+    const confirmar = window.confirm(
+      "Tem certeza que deseja remover este aluno do tatame?",
+    );
+    if (confirmar) {
+      try {
+        await api.delete(`/alunos/${id}`);
+        fetchAlunos();
+      } catch (error) {
+        alert("Erro ao excluir aluno.");
+      }
+    }
+  };
+
+  // Função que puxa os dados do card para os inputs
+  const handleEditar = (aluno) => {
+    const formatarParaInput = (dataString) => {
+      if (!dataString) return "";
+      const data = new Date(dataString);
+      data.setMinutes(data.getMinutes() + data.getTimezoneOffset());
+      return data.toISOString().split("T")[0];
+    };
+
+    setEditandoId(aluno.id);
+    setNome(aluno.nome);
+    setEmail(aluno.email);
+    setDataNascimento(formatarParaInput(aluno.data_nascimento));
+    setUltimaGraduacao(formatarParaInput(aluno.data_ultima_graduacao));
+    setFaixa(aluno.faixa);
+    setGrau(aluno.grau);
+    setGenero(aluno.genero);
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  // Helpers
   const calcularIdade = (dataString) => {
     const hoje = new Date();
     const nascimento = new Date(dataString);
@@ -91,7 +140,7 @@ export default function Alunos() {
     return data.toLocaleDateString("pt-BR");
   };
 
-  // Filtragem para as colunas (corte de 16 anos para Juvenil)
+  // Filtros
   const alunosJuvenil = listaAlunos.filter(
     (a) => calcularIdade(a.data_nascimento) < 16,
   );
@@ -102,7 +151,7 @@ export default function Alunos() {
     (a) => calcularIdade(a.data_nascimento) >= 16 && a.genero === "Feminino",
   );
 
-  // Componente interno para o Card
+  // Componente Card renderizado dentro do map
   const RenderCardAluno = ({ aluno }) => (
     <div className="aluno-card" key={aluno.id}>
       <div className="nome">{aluno.nome}</div>
@@ -120,8 +169,12 @@ export default function Alunos() {
         <strong>Grau:</strong> {aluno.grau}
       </p>
       <div className="aluno-acoes">
-        <button className="btn-acao">Editar</button>
-        <button className="btn-acao">Excluir</button>
+        <button className="btn-acao" onClick={() => handleEditar(aluno)}>
+          Editar
+        </button>
+        <button className="btn-acao" onClick={() => handleExcluir(aluno.id)}>
+          Excluir
+        </button>
       </div>
     </div>
   );
@@ -148,9 +201,9 @@ export default function Alunos() {
 
       <div className="alunos-content">
         <div className="form-card">
-          <h2>Cadastro de Aluno</h2>
+          <h2>{editandoId ? "Editando Aluno" : "Cadastro de Aluno"}</h2>
 
-          <form onSubmit={handleCadastrar}>
+          <form onSubmit={handleSalvar}>
             <div className="form-group" style={{ marginBottom: "1rem" }}>
               <label>Nome Completo</label>
               <input
@@ -170,6 +223,7 @@ export default function Alunos() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                disabled={!!editandoId}
               />
             </div>
 
@@ -255,9 +309,26 @@ export default function Alunos() {
               </div>
             </div>
 
-            <button type="submit" className="btn-submit">
-              Salvar Cadastro
-            </button>
+            <div style={{ display: "flex", gap: "1rem", marginTop: "1.5rem" }}>
+              <button
+                type="submit"
+                className="btn-submit"
+                style={{ marginTop: 0 }}
+              >
+                {editandoId ? "Salvar Alterações" : "Salvar Cadastro"}
+              </button>
+
+              {editandoId && (
+                <button
+                  type="button"
+                  className="btn-submit"
+                  onClick={limparFormulario}
+                  style={{ marginTop: 0, backgroundColor: "#666" }}
+                >
+                  Cancelar
+                </button>
+              )}
+            </div>
           </form>
         </div>
 
