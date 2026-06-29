@@ -1,0 +1,205 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.dashboard-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #e9e9e9; /* Fundo cinza claro igual ao mockup */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* --- HEADER SUPERIOR --- */
+.top-header {
+  background: linear-gradient(to bottom, #111111 0%, #a61212 100%);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.btn-sair {
+  position: absolute;
+  top: 1.5rem;
+  left: 2rem;
+  background-color: #fff;
+  color: #333;
+  border: none;
+  padding: 0.4rem 1.2rem;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.logo-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #fff;
+}
+
+.logo-img {
+  width: 90px;
+  height: 90px;
+  object-fit: contain;
+  margin-bottom: 0.5rem;
+  background-color: #fff; /* Fundo branco temporário caso a logo seja PNG vazado */
+  border-radius: 50%;
+}
+
+.logo-container h2 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+/* --- MENU NAVEGAÇÃO --- */
+.nav-menu {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.nav-item {
+  background-color: #fff;
+  color: #a61212;
+  border: none;
+  padding: 0.4rem 1.2rem;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.nav-item.active {
+  background-color: #fff;
+  color: #333;
+}
+
+.nav-item:not(.active):hover {
+  background-color: #f0f0f0;
+}
+
+/* --- CONTEÚDO CENTRAL --- */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 4rem;
+}
+
+.cards-row {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 4rem;
+}
+
+.card {
+  background: white;
+  width: 200px;
+  height: 140px;
+  border-radius: 15px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  border-top: 6px solid #a61212; /* Detalhe vermelho no topo do card */
+}
+
+.card h3 {
+  font-size: 0.85rem;
+  color: #555;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.card .value {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #000;
+}
+
+/* --- BOTÃO QR CODE --- */
+.btn-qr {
+  background: linear-gradient(to bottom, #222222 0%, #ff0000 100%);
+  color: white;
+  border: none;
+  padding: 1rem 3rem;
+  border-radius: 30px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 6px 15px rgba(255, 0, 0, 0.3);
+  transition: transform 0.2s;
+}
+
+.btn-qr:hover {
+  transform: scale(1.05);
+}
+
+/* --- RESPONSIVIDADE (MOBILE) --- */
+@media (max-width: 768px) {
+  .top-header {
+    padding: 1rem;
+  }
+
+  /* Reposiciona o botão de Sair para não sobrepor a logo em telas pequenas */
+  .btn-sair {
+    position: static; 
+    align-self: flex-start;
+    margin-bottom: 1rem;
+  }
+
+  .logo-img {
+    width: 70px;
+    height: 70px;
+  }
+
+  /* Permite que o menu quebre de linha se os botões não couberem lado a lado */
+  .nav-menu {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .nav-item {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+  }
+
+  .main-content {
+    padding-top: 2rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  /* Transforma a linha de cards em uma coluna empilhada */
+  .cards-row {
+    flex-direction: column;
+    width: 100%;
+    max-width: 320px; /* Evita que o card fique esticado demais no mobile */
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .card {
+    width: 100%;
+    height: 120px;
+  }
+
+  /* Ajusta o tamanho do botão principal */
+  .btn-qr {
+    font-size: 1.2rem;
+    padding: 0.8rem 2rem;
+    width: 100%;
+    max-width: 320px;
+  }
+}

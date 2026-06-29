@@ -24,8 +24,10 @@ app.get('/api/teste-banco', async (req, res) => {
 });
 
 const authRoutes = require('./routes/authRoutes');
-app.use('/api/auth', authRoutes);
+const alunoRoutes = require('./routes/alunoRoutes')
 
+app.use('/api/auth', authRoutes);
+app.use('/api/alunos', alunoRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
