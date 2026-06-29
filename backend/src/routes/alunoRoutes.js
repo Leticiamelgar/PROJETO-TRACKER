@@ -14,26 +14,33 @@ router.get('/listar', async (req, res) => {
 });
 
 router.post('/cadastrar', async (req, res) => {
-    const { nome, email, senha } = req.body;
+    // 1. Recebe tudo do Front-End (inclusive os campos novos do Figma)
+    const { nome, email, dataNascimento, ultimaGraduacao, faixa, grau, genero } = req.body;
+    const senhaPadrao = '123456'; 
 
     try {
-        // Verifica se o email já existe para evitar duplicidade
+        // Verifica se o e-mail já existe
         const checkEmail = await db.query('SELECT * FROM usuarios WHERE email = $1', [email]);
         if (checkEmail.rows.length > 0) {
             return res.status(400).json({ error: "Este e-mail já está cadastrado." });
         }
 
-        // Insere o novo aluno no banco de dados
-        // Forçamos o perfil como 'Aluno' por padrão para esta rota
-        const result = await db.query(
-            'INSERT INTO usuarios (nome, email, senha, perfil) VALUES ($1, $2, $3, $4) RETURNING id, nome, email',
-            [nome, email, senha, 'Aluno']
+        // 2. INSERE NA TABELA USUARIOS (e pega o ID de volta)
+        const userResult = await db.query(
+            'INSERT INTO usuarios (nome, email, senha, perfil) VALUES ($1, $2, $3, $4) RETURNING id',
+            [nome, email, senhaPadrao, 'Aluno']
+        );
+        
+        const novoUsuarioId = userResult.rows[0].id;
+
+        // 3. INSERE NA TABELA ALUNOS (usando o ID gerado acima)
+        await db.query(
+            `INSERT INTO alunos (usuario_id, data_nascimento, data_ultima_graduacao, faixa, grau, genero) 
+             VALUES ($1, $2, $3, $4, $5, $6)`,
+            [novoUsuarioId, dataNascimento, ultimaGraduacao, faixa, grau, genero]
         );
 
-        res.status(201).json({
-            mensagem: "Aluno cadastrado com sucesso!",
-            aluno: result.rows[0]
-        });
+        res.status(201).json({ mensagem: "Aluno matriculado com sucesso!" });
 
     } catch (error) {
         console.error("Erro ao cadastrar aluno:", error);
