@@ -4,6 +4,8 @@ import api from "../services/api";
 import "./Dashboard.css";
 import "./Alunos.css";
 import logoGB from "../assets/logo.png";
+import Agenda from "./Agenda";
+import Graduacoes from "./Graduacoes";
 
 export default function Alunos() {
   const navigate = useNavigate();
@@ -193,9 +195,25 @@ export default function Alunos() {
           <button className="nav-item" onClick={() => navigate("/professor")}>
             Início
           </button>
-          <button className="nav-item">Agenda</button>
-          <button className="nav-item">Graduações</button>
-          <button className="nav-item active">Alunos</button>
+
+
+          {/* AQUI ESTÁ A CORREÇÃO: Redirecionamento da Agenda configurado */}
+          <button
+            className="nav-item"
+            onClick={() => navigate("/professor/agenda")}
+          >
+            Agenda
+          </button>
+
+          <button
+            className="nav-item"
+            onClick={() => navigate("/professor/graduacoes")}
+          >
+            Graduações
+          </button>
+          <button className="nav-item active" onClick={() => navigate("/professor/alunos")}>
+            Alunos
+          </button>
         </nav>
       </header>
 
