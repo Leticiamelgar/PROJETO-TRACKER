@@ -145,6 +145,68 @@
   transform: scale(1.05);
 }
 
+/* --- BOTÃO GERAR QR CODE --- */
+.btn-gerar-qrcode {
+  background: linear-gradient(180deg, #a61212 0%, #7b0d0d 100%);
+  color: white;
+  font-size: 1.5rem;
+  font-weight: bold;
+  padding: 1rem 3rem;
+  border-radius: 50px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 0 25px rgba(166, 18, 18, 0.6);
+  transition: transform 0.2s, box-shadow 0.2s;
+  margin-top: 3rem;
+}
+
+.btn-gerar-qrcode:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 35px rgba(166, 18, 18, 0.8);
+}
+
+/* --- MODAL DO QR CODE --- */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 3rem;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.modal-content h3 {
+  color: #333;
+  font-size: 1.3rem;
+}
+
+.btn-fechar-modal {
+  background: #333;
+  color: white;
+  border: none;
+  padding: 0.5rem 1.5rem;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 1rem;
+}
+
 /* --- RESPONSIVIDADE (MOBILE) --- */
 @media (max-width: 768px) {
   .top-header {
