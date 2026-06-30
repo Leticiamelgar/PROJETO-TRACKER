@@ -2,9 +2,6 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 import "./Dashboard.css";
-
-// IMPORTANTE: Coloque a logo do Figma dentro da pasta frontend/src/assets/
-// e descomente a linha abaixo quando for usar a imagem real:
 import logoGB from "../assets/logo.png";
 
 export default function DashboardProfessor() {
@@ -30,21 +27,28 @@ export default function DashboardProfessor() {
 
   return (
     <div className="dashboard-container">
-      {/* HEADER E MENU */}
       <header className="top-header">
         <button className="btn-sair" onClick={handleLogout}>
           Sair
         </button>
-
         <div className="logo-container">
           <img src={logoGB} alt="Logo Gracie Barra" className="logo-img" />
           <h2>Gracie Barra - Centro</h2>
         </div>
-
         <nav className="nav-menu">
           <button className="nav-item active">Início</button>
-          <button className="nav-item">Agenda</button>
-          <button className="nav-item">Graduações</button>
+          <button
+            className="nav-item"
+            onClick={() => navigate("/professor/agenda")}
+          >
+            Agenda
+          </button>
+          <button
+            className="nav-item"
+            onClick={() => navigate("/professor/graduacoes")}
+          >
+            Graduações
+          </button>
           <button
             className="nav-item"
             onClick={() => navigate("/professor/alunos")}
@@ -54,22 +58,19 @@ export default function DashboardProfessor() {
         </nav>
       </header>
 
-      {/* CONTEÚDO PRINCIPAL (CARDS E QR CODE) */}
       <main className="main-content">
         <div className="cards-row">
           <div className="card">
             <h3>Total de alunos</h3>
             <p className="value">{alunos.length}</p>
           </div>
-
           <div className="card">
             <h3>Presenças Hoje</h3>
-            <p className="value">8</p> {/* Fixo por enquanto */}
+            <p className="value">8</p>
           </div>
-
           <div className="card">
             <h3>Faltas</h3>
-            <p className="value">2</p> {/* Fixo por enquanto */}
+            <p className="value">2</p>
           </div>
         </div>
 

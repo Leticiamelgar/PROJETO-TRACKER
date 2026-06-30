@@ -24,7 +24,7 @@ router.post("/cadastrar", async (req, res) => {
     res.status(201).json({ mensagem: "Aula adicionada com sucesso!" });
   } catch (error) {
     console.error("Erro ao cadastrar aula:", error);
-    res.status(500).json({ error: "Erro interno ao cadastrar." });
+    res.status(500).json({ error: "Erro ao cadastrar." });
   }
 });
 
@@ -40,7 +40,7 @@ router.put("/:id", async (req, res) => {
     res.json({ mensagem: "Aula atualizada com sucesso!" });
   } catch (error) {
     console.error("Erro ao atualizar aula:", error);
-    res.status(500).json({ error: "Erro ao atualizar dados." });
+    res.status(500).json({ error: "Erro ao atualizar." });
   }
 });
 
@@ -52,7 +52,7 @@ router.delete("/:id", async (req, res) => {
     res.json({ mensagem: "Aula removida com sucesso!" });
   } catch (error) {
     console.error("Erro ao excluir aula:", error);
-    res.status(500).json({ error: "Erro ao excluir aula." });
+    res.status(500).json({ error: "Erro ao excluir." });
   }
 });
 

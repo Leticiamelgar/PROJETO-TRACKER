@@ -4,8 +4,6 @@ import api from "../services/api";
 import "./Dashboard.css";
 import "./Alunos.css";
 import logoGB from "../assets/logo.png";
-import Agenda from "./Agenda";
-import Graduacoes from "./Graduacoes";
 
 export default function Alunos() {
   const navigate = useNavigate();
@@ -18,11 +16,7 @@ export default function Alunos() {
   const [faixa, setFaixa] = useState("");
   const [grau, setGrau] = useState("");
   const [genero, setGenero] = useState("");
-
-  // Estado para controlar se estamos editando um aluno (guarda o ID dele)
   const [editandoId, setEditandoId] = useState(null);
-
-  // Estado da lista de alunos
   const [listaAlunos, setListaAlunos] = useState([]);
 
   const fetchAlunos = async () => {
@@ -43,7 +37,6 @@ export default function Alunos() {
     navigate("/");
   };
 
-  // Limpa o formulário e sai do modo de edição
   const limparFormulario = () => {
     setNome("");
     setEmail("");
@@ -55,10 +48,8 @@ export default function Alunos() {
     setEditandoId(null);
   };
 
-  // Função unificada para Salvar Novo Cadastro ou Salvar Alterações
   const handleSalvar = async (e) => {
     e.preventDefault();
-
     const dadosAluno = {
       nome,
       email,
@@ -71,15 +62,12 @@ export default function Alunos() {
 
     try {
       if (editandoId) {
-        // Modo Edição
         await api.put(`/alunos/${editandoId}`, dadosAluno);
         alert("Alterações salvas com sucesso!");
       } else {
-        // Modo Cadastro Novo
         await api.post("/alunos/cadastrar", dadosAluno);
-        alert("Aluno cadastrado com sucesso! A senha padrão é 123456.");
+        alert("Aluno cadastrado com sucesso!");
       }
-
       limparFormulario();
       fetchAlunos();
     } catch (err) {
@@ -87,12 +75,8 @@ export default function Alunos() {
     }
   };
 
-  // Função de Excluir com confirmação
   const handleExcluir = async (id) => {
-    const confirmar = window.confirm(
-      "Tem certeza que deseja remover este aluno do tatame?",
-    );
-    if (confirmar) {
+    if (window.confirm("Tem certeza que deseja remover este aluno?")) {
       try {
         await api.delete(`/alunos/${id}`);
         fetchAlunos();
@@ -102,7 +86,6 @@ export default function Alunos() {
     }
   };
 
-  // Função que puxa os dados do card para os inputs
   const handleEditar = (aluno) => {
     const formatarParaInput = (dataString) => {
       if (!dataString) return "";
@@ -119,19 +102,16 @@ export default function Alunos() {
     setFaixa(aluno.faixa);
     setGrau(aluno.grau);
     setGenero(aluno.genero);
-
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  // Helpers
+  // Funções Auxiliares
   const calcularIdade = (dataString) => {
     const hoje = new Date();
     const nascimento = new Date(dataString);
     let idade = hoje.getFullYear() - nascimento.getFullYear();
     const m = hoje.getMonth() - nascimento.getMonth();
-    if (m < 0 || (m === 0 && hoje.getDate() < nascimento.getDate())) {
-      idade--;
-    }
+    if (m < 0 || (m === 0 && hoje.getDate() < nascimento.getDate())) idade--;
     return idade;
   };
 
@@ -142,7 +122,6 @@ export default function Alunos() {
     return data.toLocaleDateString("pt-BR");
   };
 
-  // Filtros
   const alunosJuvenil = listaAlunos.filter(
     (a) => calcularIdade(a.data_nascimento) < 16,
   );
@@ -153,7 +132,6 @@ export default function Alunos() {
     (a) => calcularIdade(a.data_nascimento) >= 16 && a.genero === "Feminino",
   );
 
-  // Componente Card renderizado dentro do map
   const RenderCardAluno = ({ aluno }) => (
     <div className="aluno-card" key={aluno.id}>
       <div className="nome">{aluno.nome}</div>
@@ -195,56 +173,45 @@ export default function Alunos() {
           <button className="nav-item" onClick={() => navigate("/professor")}>
             Início
           </button>
-
-
-          {/* AQUI ESTÁ A CORREÇÃO: Redirecionamento da Agenda configurado */}
           <button
             className="nav-item"
             onClick={() => navigate("/professor/agenda")}
           >
             Agenda
           </button>
-
           <button
             className="nav-item"
             onClick={() => navigate("/professor/graduacoes")}
           >
             Graduações
           </button>
-          <button className="nav-item active" onClick={() => navigate("/professor/alunos")}>
-            Alunos
-          </button>
+          <button className="nav-item active">Alunos</button>
         </nav>
       </header>
 
       <div className="alunos-content">
         <div className="form-card">
           <h2>{editandoId ? "Editando Aluno" : "Cadastro de Aluno"}</h2>
-
           <form onSubmit={handleSalvar}>
             <div className="form-group" style={{ marginBottom: "1rem" }}>
               <label>Nome Completo</label>
               <input
                 type="text"
-                placeholder="Digite o nome do aluno"
                 value={nome}
                 onChange={(e) => setNome(e.target.value)}
                 required
               />
             </div>
-
             <div className="form-group" style={{ marginBottom: "1rem" }}>
               <label>E-mail</label>
               <input
                 type="email"
-                placeholder="Digite o e-mail do aluno"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                required
                 disabled={!!editandoId}
+                required
               />
             </div>
-
             <div className="form-row">
               <div className="form-group">
                 <label>Data de Nascimento</label>
@@ -265,7 +232,6 @@ export default function Alunos() {
                 />
               </div>
             </div>
-
             <div className="form-row">
               <div className="form-group">
                 <label>Faixa</label>
@@ -298,11 +264,10 @@ export default function Alunos() {
                 </select>
               </div>
             </div>
-
             <div className="form-group">
               <label>Gênero:</label>
               <div className="radio-group">
-                <label className="radio-item">
+                <label>
                   <input
                     type="radio"
                     name="genero"
@@ -313,7 +278,7 @@ export default function Alunos() {
                   />{" "}
                   Masculino
                 </label>
-                <label className="radio-item">
+                <label>
                   <input
                     type="radio"
                     name="genero"
@@ -326,22 +291,16 @@ export default function Alunos() {
                 </label>
               </div>
             </div>
-
             <div style={{ display: "flex", gap: "1rem", marginTop: "1.5rem" }}>
-              <button
-                type="submit"
-                className="btn-submit"
-                style={{ marginTop: 0 }}
-              >
+              <button type="submit" className="btn-submit">
                 {editandoId ? "Salvar Alterações" : "Salvar Cadastro"}
               </button>
-
               {editandoId && (
                 <button
                   type="button"
                   className="btn-submit"
                   onClick={limparFormulario}
-                  style={{ marginTop: 0, backgroundColor: "#666" }}
+                  style={{ backgroundColor: "#666" }}
                 >
                   Cancelar
                 </button>
@@ -353,59 +312,21 @@ export default function Alunos() {
         <div className="categorias-container">
           <div className="categoria-coluna">
             <h3>Homem</h3>
-            {alunosHomens.length > 0 ? (
-              alunosHomens.map((aluno) => (
-                <RenderCardAluno key={aluno.id} aluno={aluno} />
-              ))
-            ) : (
-              <p
-                style={{
-                  textAlign: "center",
-                  fontSize: "0.85rem",
-                  color: "#666",
-                }}
-              >
-                Nenhum aluno cadastrado.
-              </p>
-            )}
+            {alunosHomens.map((a) => (
+              <RenderCardAluno key={a.id} aluno={a} />
+            ))}
           </div>
-
           <div className="categoria-coluna">
             <h3>Mulher</h3>
-            {alunosMulheres.length > 0 ? (
-              alunosMulheres.map((aluno) => (
-                <RenderCardAluno key={aluno.id} aluno={aluno} />
-              ))
-            ) : (
-              <p
-                style={{
-                  textAlign: "center",
-                  fontSize: "0.85rem",
-                  color: "#666",
-                }}
-              >
-                Nenhuma aluna cadastrada.
-              </p>
-            )}
+            {alunosMulheres.map((a) => (
+              <RenderCardAluno key={a.id} aluno={a} />
+            ))}
           </div>
-
           <div className="categoria-coluna">
             <h3>Juvenil</h3>
-            {alunosJuvenil.length > 0 ? (
-              alunosJuvenil.map((aluno) => (
-                <RenderCardAluno key={aluno.id} aluno={aluno} />
-              ))
-            ) : (
-              <p
-                style={{
-                  textAlign: "center",
-                  fontSize: "0.85rem",
-                  color: "#666",
-                }}
-              >
-                Nenhum aluno juvenil cadastrado.
-              </p>
-            )}
+            {alunosJuvenil.map((a) => (
+              <RenderCardAluno key={a.id} aluno={a} />
+            ))}
           </div>
         </div>
       </div>

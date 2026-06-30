@@ -8,20 +8,22 @@ import logoGB from "../assets/logo.png";
 export default function Agenda() {
   const navigate = useNavigate();
 
-  // GUARDA DE ROTA: Verifica se o usuário está logado ao carregar a página
+  // Estado dos formulários
+  const [diaSemana, setDiaSemana] = useState("");
+  const [horario, setHorario] = useState("");
+  const [tipoAula, setTipoAula] = useState("");
+  const [editandoId, setEditandoId] = useState(null);
+  const [listaAgenda, setListaAgenda] = useState([]);
+
+  // GUARDA DE ROTA
   useEffect(() => {
     const usuarioLogado = localStorage.getItem("@JJTrack:usuario");
     if (!usuarioLogado) {
       navigate("/");
+    } else {
+      fetchAgenda();
     }
   }, [navigate]);
-
-  const [diaSemana, setDiaSemana] = useState("");
-  const [horario, setHorario] = useState("");
-  const [tipoAula, setTipoAula] = useState("");
-
-  const [editandoId, setEditandoId] = useState(null);
-  const [listaAgenda, setListaAgenda] = useState([]);
 
   const fetchAgenda = async () => {
     try {
@@ -31,10 +33,6 @@ export default function Agenda() {
       console.error("Erro ao buscar agenda:", error);
     }
   };
-
-  useEffect(() => {
-    fetchAgenda();
-  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("@JJTrack:usuario");
@@ -137,7 +135,12 @@ export default function Agenda() {
             Início
           </button>
           <button className="nav-item active">Agenda</button>
-          <button className="nav-item">Graduações</button>
+          <button
+            className="nav-item"
+            onClick={() => navigate("/professor/graduacoes")}
+          >
+            Graduações
+          </button>
           <button
             className="nav-item"
             onClick={() => navigate("/professor/alunos")}
