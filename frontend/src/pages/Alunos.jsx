@@ -194,7 +194,9 @@ export default function Alunos() {
             Início
           </button>
           <button className="nav-item">Agenda</button>
-          <button className="nav-item">Graduações</button>
+          <button className="nav-item" onClick={() => navigate('/professor/graduacoes')}>
+            Graduações
+          </button>
           <button className="nav-item active">Alunos</button>
         </nav>
       </header>

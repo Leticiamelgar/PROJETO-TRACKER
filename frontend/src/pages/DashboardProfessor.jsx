@@ -43,7 +43,7 @@ export default function DashboardProfessor() {
         <nav className="nav-menu">
           <button className="nav-item active">Início</button>
           <button className="nav-item">Agenda</button>
-          <button className="nav-item">Graduações</button>
+          <button className="nav-item" onClick={() => navigate('/professor/graduacoes')}>Graduações</button>
           <button className="nav-item" onClick={() => navigate('/professor/alunos')}>Alunos</button>
         </nav>
       </header>

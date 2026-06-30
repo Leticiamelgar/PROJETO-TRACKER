@@ -1,0 +1,181 @@
+.graduacoes-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1rem;
+  width: 100%;
+}
+
+/* --- BARRA DE BUSCA E FILTROS --- */
+.search-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  max-width: 500px;
+  margin-bottom: 2rem;
+}
+
+/* A caixa branca agora é o wrapper, não o input diretamente */
+.search-input-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+}
+
+.search-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 0.75rem;
+  opacity: 0.6; /* Deixa a lupa um pouco mais suave */
+}
+
+/* O input em si agora não tem borda, pois o wrapper é quem tem a borda */
+.search-input {
+  border: none;
+  outline: none;
+  font-size: 1rem;
+  width: 100%;
+  background: transparent;
+}
+
+.filter-icon {
+  width: 28px; /* Ajuste este tamanho conforme o SVG/PNG que você baixou */
+  height: 28px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.filter-icon:hover {
+  transform: scale(1.1); /* Dá um efeitinho de crescer ao passar o mouse */
+}
+
+/* --- FILTROS EM PÍLULA (ATUALIZADO) --- */
+.filters-row {
+  display: flex !important; /* Força o comportamento flex de linha */
+  flex-direction: row !important;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap; /* Permite quebrar a linha se não couber na tela */
+  justify-content: center;
+  width: 100%;
+  max-width: 500px; /* Alinha o tamanho máximo com a barra de busca */
+}
+
+.btn-filter {
+  background: white;
+  color: #c62828;
+  border: 1px solid #c62828;
+  padding: 0.5rem 1.2rem;
+  border-radius: 20px; /* Dá o formato arredondado de pílula */
+  font-weight: bold;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  white-space: nowrap; /* Impede o texto de quebrar dentro do botão */
+}
+
+.btn-filter.active, .btn-filter:hover {
+  background-color: #c62828 !important;
+  color: white !important;
+}
+
+/* --- CARDS DE PROGRESSO --- */
+.graduacoes-container {
+  background: white;
+  width: 100%;
+  max-width: 500px;
+  border-radius: 15px;
+  padding: 2rem;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  margin-bottom: 2rem;
+}
+
+.graduacoes-container h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+.progress-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0;
+  border-bottom: 1px solid #eee;
+}
+
+.progress-card:last-child {
+  border-bottom: none;
+}
+
+.student-info h4 {
+  font-size: 1rem;
+  color: #333;
+  margin-bottom: 0.25rem;
+}
+
+.student-info p {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.badge-status {
+  display: inline-block;
+  background-color: #c62828;
+  color: white;
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  margin-top: 0.5rem;
+  margin-right: 0.5rem;
+}
+
+.badge-action {
+  display: inline-block;
+  background: white;
+  color: #c62828;
+  border: 1px solid #c62828;
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* --- ESTILIZAÇÃO DA BARRA DE PROGRESSO --- */
+.progress-bar-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+}
+
+.progress-bar-container {
+  width: 120px;
+  height: 20px;
+  background-color: #000; /* Fundo preto da faixa tradicional */
+  border: 1px solid #000;
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background-color: #ff0000; /* Barra vermelha de preenchimento */
+  transition: width 0.3s;
+}
+
+.progress-percentage {
+  font-size: 0.85rem;
+  font-weight: bold;
+  color: #333;
+}
