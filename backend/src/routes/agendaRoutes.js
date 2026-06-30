@@ -15,16 +15,17 @@ router.get("/listar", async (req, res) => {
 
 // CADASTRAR
 router.post("/cadastrar", async (req, res) => {
-  const { dia_semana, horario, tipo_aula } = req.body;
+  // Agora recebemos a turma também!
+  const { dia_semana, horario, tipo_aula, turma } = req.body; 
   try {
     await db.query(
-      "INSERT INTO agenda (dia_semana, horario, tipo_aula) VALUES ($1, $2, $3)",
-      [dia_semana, horario, tipo_aula],
+      "INSERT INTO agenda (dia_semana, horario, tipo_aula, turma) VALUES ($1, $2, $3, $4)",
+      [dia_semana, horario, tipo_aula, turma]
     );
     res.status(201).json({ mensagem: "Aula adicionada com sucesso!" });
   } catch (error) {
     console.error("Erro ao cadastrar aula:", error);
-    res.status(500).json({ error: "Erro ao cadastrar." });
+    res.status(500).json({ error: "Erro interno ao cadastrar." });
   }
 });
 

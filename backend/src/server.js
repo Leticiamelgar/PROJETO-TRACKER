@@ -11,10 +11,14 @@ app.use(express.json());
 const authRoutes = require("./routes/authRoutes");
 const alunoRoutes = require("./routes/alunoRoutes");
 const agendaRoutes = require("./routes/agendaRoutes");
+const qrCodeRoutes = require("./routes/qrCodeRoutes");
+const turmasRoutes = require('./routes/turmasRoutes');
 
 app.use("/api/auth", authRoutes);
 app.use("/api/alunos", alunoRoutes);
 app.use("/api/agenda", agendaRoutes);
+app.use("/api/qrcode", qrCodeRoutes);
+app.use('/api/turmas', turmasRoutes);
 
 app.get("/api/teste-banco", async (req, res) => {
   try {
