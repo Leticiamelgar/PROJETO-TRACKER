@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import api from "../services/api";
 import "./Dashboard.css";
 import "./Graduacoes.css";
 import logoGB from "../assets/logo.png";
@@ -8,28 +9,63 @@ import iconeFiltro from "../assets/filtro.png";
 
 export default function Graduacoes() {
   const navigate = useNavigate();
+  const [alunos, setAlunos] = useState([]);
   const [busca, setBusca] = useState("");
   const [filtroAtivo, setFiltroAtivo] = useState("Todos");
   const [mostrarFiltros, setMostrarFiltros] = useState(false);
 
-  const alunosMock = [
-    {
-      id: 1,
-      nome: "Gustavo Peregrino",
-      faixa: "Branca",
-      graus: 4,
-      progresso: 85,
-      apto: true,
-    },
-    {
-      id: 2,
-      nome: "Exemplo Aluno",
-      faixa: "Azul",
-      graus: 1,
-      progresso: 40,
-      apto: false,
-    },
-  ];
+  useEffect(() => {
+    fetchAlunos();
+  }, []);
+
+  const fetchAlunos = async () => {
+    try {
+      const response = await api.get("/alunos/listar");
+      setAlunos(response.data);
+    } catch (error) {
+      console.error("Erro ao buscar alunos:", error);
+    }
+  };
+
+  const handleGraduar = async (id) => {
+    if (
+      window.confirm(
+        "Confirmar graduação? O grau será incrementado e a data resetada para hoje.",
+      )
+    ) {
+      try {
+        await api.put(`/alunos/graduar/${id}`);
+        alert("Graduação realizada com sucesso!");
+        fetchAlunos();
+      } catch (error) {
+        alert("Erro ao realizar graduação.");
+      }
+    }
+  };
+
+  const calcularProgresso = (aluno) => {
+    const hoje = new Date();
+    const ultima = new Date(aluno.data_ultima_graduacao);
+    const diffMeses =
+      (hoje.getFullYear() - ultima.getFullYear()) * 12 +
+      (hoje.getMonth() - ultima.getMonth());
+
+    let tempoNecessario = 0;
+    if (aluno.faixa === "Branca") tempoNecessario = 12;
+    else if (aluno.faixa === "Azul") tempoNecessario = 24;
+    else if (aluno.faixa === "Roxa") tempoNecessario = 18;
+    else if (aluno.faixa === "Marrom") tempoNecessario = 18;
+    else if (aluno.faixa === "Preta") {
+      tempoNecessario = parseInt(aluno.grau) >= 4 ? 60 : 36;
+    }
+
+    const progresso = Math.min(
+      100,
+      Math.floor((diffMeses / tempoNecessario) * 100),
+    );
+    const apto = progresso >= 100;
+    return { progresso, apto };
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("@JJTrack:usuario");
@@ -46,6 +82,16 @@ export default function Graduacoes() {
     "Marrom",
     "Preta",
   ];
+
+  const alunosFiltrados = alunos.filter((aluno) => {
+    const matchBusca = aluno.nome.toLowerCase().includes(busca.toLowerCase());
+    const matchFiltro =
+      filtroAtivo === "Todos" ||
+      (filtroAtivo === "Aptos" && calcularProgresso(aluno).apto) ||
+      (filtroAtivo === "Não Aptos" && !calcularProgresso(aluno).apto) ||
+      aluno.faixa === filtroAtivo;
+    return matchBusca && matchFiltro;
+  });
 
   return (
     <div className="dashboard-container">
@@ -113,36 +159,48 @@ export default function Graduacoes() {
 
         <div className="graduacoes-container">
           <h2>Acompanhamento de progresso</h2>
-          {alunosMock.map((aluno, index) => (
-            <div className="progress-card" key={index}>
-              <div className="student-info">
-                <h4>{aluno.nome}</h4>
-                <p>
-                  Faixa {aluno.faixa} - {aluno.graus} Graus
-                </p>
-                {aluno.apto && (
-                  <>
-                    <span className="badge-status">Apto</span>
-                    <button
-                      className="badge-action"
-                      onClick={() => alert("Graduação realizada!")}
-                    >
-                      Graduar
-                    </button>
-                  </>
-                )}
-              </div>
-              <div className="progress-bar-wrapper">
-                <div className="progress-bar-container">
-                  <div
-                    className="progress-bar-fill"
-                    style={{ width: `${aluno.progresso}%` }}
-                  ></div>
+          {alunosFiltrados.length > 0 ? (
+            alunosFiltrados.map((aluno) => {
+              const { progresso, apto } = calcularProgresso(aluno);
+              return (
+                <div className="progress-card" key={aluno.id}>
+                  <div className="student-info">
+                    <h4>{aluno.nome}</h4>
+                    <p>
+                      Faixa {aluno.faixa} - {aluno.grau} Graus
+                    </p>
+                    {apto && (
+                      <div style={{ marginTop: "5px" }}>
+                        <span className="badge-status">Apto</span>
+                        <button
+                          className="badge-action"
+                          onClick={() => handleGraduar(aluno.id)}
+                        >
+                          Graduar
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                  <div className="progress-bar-wrapper">
+                    <div className="progress-bar-container">
+                      <div
+                        className="progress-bar-fill"
+                        style={{
+                          width: `${progresso}%`,
+                          backgroundColor: apto ? "#27ae60" : "#ff0000",
+                        }}
+                      ></div>
+                    </div>
+                    <span className="progress-percentage">{progresso}%</span>
+                  </div>
                 </div>
-                <span className="progress-percentage">{aluno.progresso}%</span>
-              </div>
-            </div>
-          ))}
+              );
+            })
+          ) : (
+            <p style={{ textAlign: "center", color: "#666" }}>
+              Nenhum aluno encontrado.
+            </p>
+          )}
         </div>
       </div>
     </div>

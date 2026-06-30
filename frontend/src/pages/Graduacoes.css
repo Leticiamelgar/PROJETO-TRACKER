@@ -13,11 +13,10 @@
   align-items: center;
   gap: 1rem;
   width: 100%;
-  max-width: 500px;
+  max-width: 600px;
   margin-bottom: 2rem;
 }
 
-/* A caixa branca agora é o wrapper, não o input diretamente */
 .search-input-wrapper {
   flex: 1;
   display: flex;
@@ -32,10 +31,8 @@
   width: 20px;
   height: 20px;
   margin-right: 0.75rem;
-  opacity: 0.6; /* Deixa a lupa um pouco mais suave */
+  opacity: 0.6;
 }
-
-/* O input em si agora não tem borda, pois o wrapper é quem tem a borda */
 .search-input {
   border: none;
   outline: none;
@@ -43,29 +40,25 @@
   width: 100%;
   background: transparent;
 }
-
 .filter-icon {
-  width: 28px; /* Ajuste este tamanho conforme o SVG/PNG que você baixou */
+  width: 28px;
   height: 28px;
   cursor: pointer;
   transition: transform 0.2s;
 }
-
 .filter-icon:hover {
-  transform: scale(1.1); /* Dá um efeitinho de crescer ao passar o mouse */
+  transform: scale(1.1);
 }
 
-/* --- FILTROS EM PÍLULA (ATUALIZADO) --- */
 .filters-row {
-  display: flex !important; /* Força o comportamento flex de linha */
-  flex-direction: row !important;
+  display: flex;
+  flex-direction: row;
   gap: 0.75rem;
-  margin-top: 1rem;
   margin-bottom: 2rem;
-  flex-wrap: wrap; /* Permite quebrar a linha se não couber na tela */
+  flex-wrap: wrap;
   justify-content: center;
   width: 100%;
-  max-width: 500px; /* Alinha o tamanho máximo com a barra de busca */
+  max-width: 600px;
 }
 
 .btn-filter {
@@ -73,15 +66,15 @@
   color: #c62828;
   border: 1px solid #c62828;
   padding: 0.5rem 1.2rem;
-  border-radius: 20px; /* Dá o formato arredondado de pílula */
+  border-radius: 20px;
   font-weight: bold;
   font-size: 0.85rem;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
-  white-space: nowrap; /* Impede o texto de quebrar dentro do botão */
 }
 
-.btn-filter.active, .btn-filter:hover {
+.btn-filter.active,
+.btn-filter:hover {
   background-color: #c62828 !important;
   color: white !important;
 }
@@ -90,92 +83,79 @@
 .graduacoes-container {
   background: white;
   width: 100%;
-  max-width: 500px;
+  max-width: 600px;
   border-radius: 15px;
   padding: 2rem;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-  margin-bottom: 2rem;
-}
-
-.graduacoes-container h2 {
-  text-align: center;
-  margin-bottom: 1.5rem;
-  font-size: 1.25rem;
-  font-weight: bold;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
 }
 
 .progress-card {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  padding: 1rem 0;
+  align-items: center; /* Alinha tudo verticalmente no centro */
+  padding: 1.2rem 0;
   border-bottom: 1px solid #eee;
-}
-
-.progress-card:last-child {
-  border-bottom: none;
 }
 
 .student-info h4 {
   font-size: 1rem;
   color: #333;
-  margin-bottom: 0.25rem;
+  margin: 0;
 }
-
 .student-info p {
   font-size: 0.85rem;
   color: #666;
+  margin: 0.25rem 0;
 }
 
 .badge-status {
   display: inline-block;
-  background-color: #c62828;
+  background-color: #27ae60;
   color: white;
   padding: 0.2rem 0.6rem;
   border-radius: 12px;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: bold;
-  margin-top: 0.5rem;
-  margin-right: 0.5rem;
 }
 
 .badge-action {
-  display: inline-block;
-  background: white;
-  color: #c62828;
-  border: 1px solid #c62828;
+  background: #27ae60;
+  color: white;
+  border: none;
   padding: 0.2rem 0.6rem;
   border-radius: 12px;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: bold;
   cursor: pointer;
+  margin-left: 0.5rem;
 }
 
 /* --- ESTILIZAÇÃO DA BARRA DE PROGRESSO --- */
 .progress-bar-wrapper {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.25rem;
+  align-items: center; /* Alinha barra e texto lado a lado */
+  gap: 10px;
 }
 
 .progress-bar-container {
   width: 120px;
-  height: 20px;
-  background-color: #000; /* Fundo preto da faixa tradicional */
-  border: 1px solid #000;
+  height: 18px;
+  background-color: #000; /* Fundo faixa */
+  border-radius: 4px;
   position: relative;
   overflow: hidden;
 }
 
 .progress-bar-fill {
   height: 100%;
-  background-color: #ff0000; /* Barra vermelha de preenchimento */
-  transition: width 0.3s;
+  background-color: #ff0000; /* Preenchimento */
+  transition: width 0.5s ease-in-out;
 }
 
 .progress-percentage {
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   font-weight: bold;
   color: #333;
+  min-width: 35px;
+  text-align: right;
 }

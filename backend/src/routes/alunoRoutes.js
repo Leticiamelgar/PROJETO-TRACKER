@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const db = require("../config/db");
 
-// LISTAR
+// LISTAR ALUNOS
 router.get("/listar", async (req, res) => {
   try {
     const query = `
@@ -21,7 +21,7 @@ router.get("/listar", async (req, res) => {
   }
 });
 
-// CADASTRAR
+// CADASTRAR ALUNO
 router.post("/cadastrar", async (req, res) => {
   const { nome, email, dataNascimento, ultimaGraduacao, faixa, grau, genero } =
     req.body;
@@ -56,20 +56,31 @@ router.post("/cadastrar", async (req, res) => {
   }
 });
 
-// EXCLUIR
-router.delete("/:id", async (req, res) => {
+// GRADUAR ALUNO (NOVA ROTA)
+router.put("/graduar/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    await db.query("DELETE FROM alunos WHERE usuario_id = $1", [id]);
-    await db.query("DELETE FROM usuarios WHERE id = $1", [id]);
-    res.json({ mensagem: "Aluno removido com sucesso!" });
+    const aluno = await db.query(
+      "SELECT grau FROM alunos WHERE usuario_id = $1",
+      [id],
+    );
+    if (aluno.rows.length === 0)
+      return res.status(404).json({ error: "Aluno não encontrado." });
+
+    const novoGrau = parseInt(aluno.rows[0].grau) + 1;
+
+    await db.query(
+      `UPDATE alunos SET data_ultima_graduacao = CURRENT_DATE, grau = $1 WHERE usuario_id = $2`,
+      [novoGrau, id],
+    );
+    res.json({ mensagem: "Graduação realizada com sucesso!", novoGrau });
   } catch (error) {
-    console.error("Erro ao excluir aluno:", error);
-    res.status(500).json({ error: "Erro ao excluir." });
+    console.error("Erro ao graduar aluno:", error);
+    res.status(500).json({ error: "Erro ao processar graduação." });
   }
 });
 
-// EDITAR
+// EDITAR ALUNO
 router.put("/:id", async (req, res) => {
   const { id } = req.params;
   const { nome, email, dataNascimento, ultimaGraduacao, faixa, grau, genero } =
@@ -90,6 +101,19 @@ router.put("/:id", async (req, res) => {
   } catch (error) {
     console.error("Erro ao atualizar aluno:", error);
     res.status(500).json({ error: "Erro ao atualizar dados." });
+  }
+});
+
+// EXCLUIR ALUNO
+router.delete("/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    await db.query("DELETE FROM alunos WHERE usuario_id = $1", [id]);
+    await db.query("DELETE FROM usuarios WHERE id = $1", [id]);
+    res.json({ mensagem: "Aluno removido com sucesso!" });
+  } catch (error) {
+    console.error("Erro ao excluir aluno:", error);
+    res.status(500).json({ error: "Erro ao excluir aluno." });
   }
 });
 
