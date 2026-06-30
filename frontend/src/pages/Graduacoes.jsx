@@ -43,21 +43,23 @@ export default function Graduacoes() {
     }
   };
 
+  // Lógica unificada para definir o tempo necessário em meses
+  const getTempoNecessario = (aluno) => {
+    if (aluno.faixa === "Branca") return 12;
+    if (aluno.faixa === "Azul") return 24;
+    if (aluno.faixa === "Roxa") return 18;
+    if (aluno.faixa === "Marrom") return 18;
+    if (aluno.faixa === "Preta") return parseInt(aluno.grau) >= 4 ? 60 : 36;
+    return 0;
+  };
+
   const calcularProgresso = (aluno) => {
     const hoje = new Date();
     const ultima = new Date(aluno.data_ultima_graduacao);
     const diffMeses =
       (hoje.getFullYear() - ultima.getFullYear()) * 12 +
       (hoje.getMonth() - ultima.getMonth());
-
-    let tempoNecessario = 0;
-    if (aluno.faixa === "Branca") tempoNecessario = 12;
-    else if (aluno.faixa === "Azul") tempoNecessario = 24;
-    else if (aluno.faixa === "Roxa") tempoNecessario = 18;
-    else if (aluno.faixa === "Marrom") tempoNecessario = 18;
-    else if (aluno.faixa === "Preta") {
-      tempoNecessario = parseInt(aluno.grau) >= 4 ? 60 : 36;
-    }
+    const tempoNecessario = getTempoNecessario(aluno);
 
     const progresso = Math.min(
       100,
@@ -65,6 +67,16 @@ export default function Graduacoes() {
     );
     const apto = progresso >= 100;
     return { progresso, apto };
+  };
+
+  // Nova função para calcular a data prevista
+  const calcularDataPrevista = (aluno) => {
+    const ultima = new Date(aluno.data_ultima_graduacao);
+    const tempoNecessario = getTempoNecessario(aluno);
+
+    // Adiciona os meses à data da última graduação
+    ultima.setMonth(ultima.getMonth() + tempoNecessario);
+    return ultima.toLocaleDateString("pt-BR");
   };
 
   const handleLogout = () => {
@@ -162,12 +174,17 @@ export default function Graduacoes() {
           {alunosFiltrados.length > 0 ? (
             alunosFiltrados.map((aluno) => {
               const { progresso, apto } = calcularProgresso(aluno);
+              const dataPrevista = calcularDataPrevista(aluno);
+
               return (
                 <div className="progress-card" key={aluno.id}>
                   <div className="student-info">
                     <h4>{aluno.nome}</h4>
                     <p>
                       Faixa {aluno.faixa} - {aluno.grau} Graus
+                    </p>
+                    <p style={{ fontSize: "0.75rem", color: "#888" }}>
+                      Previsão: <strong>{dataPrevista}</strong>
                     </p>
                     {apto && (
                       <div style={{ marginTop: "5px" }}>
