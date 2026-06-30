@@ -193,15 +193,7 @@ export default function Alunos() {
           <button className="nav-item" onClick={() => navigate("/professor")}>
             Início
           </button>
-
-          {/* AQUI ESTÁ A CORREÇÃO: Redirecionamento da Agenda configurado */}
-          <button
-            className="nav-item"
-            onClick={() => navigate("/professor/agenda")}
-          >
-            Agenda
-          </button>
-
+          <button className="nav-item">Agenda</button>
           <button className="nav-item">Graduações</button>
           <button className="nav-item active">Alunos</button>
         </nav>

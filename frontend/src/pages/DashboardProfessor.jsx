@@ -43,13 +43,7 @@ export default function DashboardProfessor() {
 
         <nav className="nav-menu">
           <button className="nav-item active">Início</button>
-          {/* CORREÇÃO AQUI: Adicionado o onClick apontando para a nova rota */}
-          <button
-            className="nav-item"
-            onClick={() => navigate("/professor/agenda")}
-          >
-            Agenda
-          </button>
+          <button className="nav-item">Agenda</button>
           <button className="nav-item">Graduações</button>
           <button
             className="nav-item"

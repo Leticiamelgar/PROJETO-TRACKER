@@ -3,7 +3,6 @@ import Login from "./pages/Login";
 import DashboardProfessor from "./pages/DashboardProfessor";
 import DashboardAluno from "./pages/DashboardAluno";
 import Alunos from "./pages/Alunos";
-import Agenda from "./pages/Agenda"; // <-- 1. IMPORTAÇÃO DA NOVA PÁGINA
 
 function App() {
   return (
@@ -12,15 +11,14 @@ function App() {
         {/* Rota inicial: carrega o Login */}
         <Route path="/" element={<Login />} />
 
-        {/* Rotas principais dos painéis */}
+        {/* Rotas principal do painel do professor */}
         <Route path="/professor" element={<DashboardProfessor />} />
+
+        {/* Rota principal do painel do aluno */}
         <Route path="/aluno" element={<DashboardAluno />} />
 
-        {/* Rotas secundárias do Professor */}
+        {/* <-- 2. NOVA ROTA PARA A TELA DE ALUNOS --> */}
         <Route path="/professor/alunos" element={<Alunos />} />
-
-        {/* <-- 2. NOVA ROTA PARA A TELA DE AGENDA --> */}
-        <Route path="/professor/agenda" element={<Agenda />} />
 
         {/* Redireciona qualquer rota inexistente (URL digitada errada) de volta para o login */}
         <Route path="*" element={<Navigate to="/" />} />
