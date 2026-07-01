@@ -21,9 +21,8 @@ export default function GraduacaoAluno() {
 
     const fetchDadosAluno = async () => {
       try {
-        // Busca os dados no back-end
         const response = await api.get(`/alunos/${dados.id}`);
-        console.log("Dados recebidos do banco:", response.data); // LOG PARA DEBUG
+        console.log("Dados que chegaram do banco:", response.data); // Isso tem que aparecer no Console (F12)
         setAlunoDb(response.data);
       } catch (error) {
         console.error("Erro na API:", error);
@@ -56,7 +55,6 @@ export default function GraduacaoAluno() {
     );
   }
 
-  // Se der erro na requisição, agora ele avisa o motivo exato
   if (mensagemErro || !alunoDb) {
     return (
       <div
@@ -73,26 +71,19 @@ export default function GraduacaoAluno() {
   }
 
   // --- MATEMÁTICA DINÂMICA DAS AULAS ---
-
-  // 1. Número real de presenças (Garante que se vier vazio, seja 0)
   const totalPresencas = Number(alunoDb.total_presencas) || 0;
 
-  // 2. Regra dinâmica: Quantas aulas para cada grau dependendo da faixa?
   const calcularAulasNecessarias = (faixa) => {
     if (faixa === "Branca") return 30;
     if (faixa === "Azul") return 45;
     if (faixa === "Roxa") return 55;
     if (faixa === "Marrom") return 65;
     if (faixa === "Preta") return 100;
-    return 30; // Padrão de segurança
+    return 30;
   };
 
   const aulasNecessarias = calcularAulasNecessarias(alunoDb.faixa);
-
-  // 3. Calcula quantas faltam e trava em 0 (para não dar número negativo)
   const aulasFaltantes = Math.max(0, aulasNecessarias - totalPresencas);
-
-  // 4. Calcula a porcentagem e trava no máximo em 100%
   const progressoPorcentagem = Math.min(
     100,
     Math.floor((totalPresencas / aulasNecessarias) * 100),
@@ -120,7 +111,6 @@ export default function GraduacaoAluno() {
       </header>
 
       <main className="aluno-content">
-        {/* CARD DA FAIXA ATUAL */}
         <div className="aluno-card" style={{ padding: "2rem" }}>
           <div style={{ fontSize: "5rem", marginBottom: "1rem" }}>🥋</div>
           <h2 style={{ margin: 0, textAlign: "center", fontSize: "1.5rem" }}>
@@ -131,10 +121,10 @@ export default function GraduacaoAluno() {
           </h2>
         </div>
 
-        {/* CARD DE PROGRESSO */}
         <div className="aluno-card" style={{ padding: "2rem" }}>
           <h3>Progresso para graduação</h3>
 
+          {/* AQUI ESTÁ O NÚMERO DINÂMICO QUE VAI MUDAR SOZINHO */}
           <div className="graduacao-aulas">{aulasFaltantes}</div>
           <div className="graduacao-texto">Aulas restantes</div>
 
