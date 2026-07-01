@@ -7,17 +7,28 @@ import logoGB from "../assets/logo.png";
 export default function DashboardAluno() {
   const navigate = useNavigate();
   const [dados, setDados] = useState(null);
-
-  // Lista simulada por enquanto (até conectarmos a tabela de presenças do banco)
-  const historicoPresenca = ["18/05", "15/05", "13/05"];
+  const [historicoPresenca, setHistoricoPresenca] = useState([]);
 
   useEffect(() => {
     const usuarioLogado = localStorage.getItem("@JJTrack:usuario");
     if (!usuarioLogado) {
       navigate("/");
-    } else {
-      setDados(JSON.parse(usuarioLogado));
+      return;
     }
+
+    const dadosUsuario = JSON.parse(usuarioLogado);
+    setDados(dadosUsuario);
+
+    const fetchPresencas = async () => {
+      try {
+        const response = await api.get(`/alunos/presencas/${dadosUsuario.id}`);
+        setHistoricoPresenca(response.data);
+      } catch (error) {
+        console.error("Erro ao buscar histórico:", error);
+      }
+    };
+
+    fetchPresencas();
   }, [navigate]);
 
   const handleLogout = () => {
@@ -25,9 +36,11 @@ export default function DashboardAluno() {
     navigate("/");
   };
 
-  const handleLerQRCode = () => {
-    // Aqui entrará a lógica de abrir a câmera futuramente
-    alert("Câmera aberta! Posicione o QR Code gerado pelo professor.");
+  const formatarDataHora = (dataString) => {
+    const data = new Date(dataString);
+    const dia = String(data.getDate()).padStart(2, "0");
+    const mes = String(data.getMonth() + 1).padStart(2, "0");
+    return `${dia}/${mes}`;
   };
 
   return (
@@ -36,9 +49,7 @@ export default function DashboardAluno() {
         <button className="btn-sair-aluno" onClick={handleLogout}>
           Sair
         </button>
-
         <img src={logoGB} alt="Gracie Barra" className="aluno-logo" />
-
         <nav className="aluno-nav">
           <button className="aluno-nav-btn active">Início</button>
           <button
@@ -57,20 +68,24 @@ export default function DashboardAluno() {
       </header>
 
       <main className="aluno-content">
-        <button className="btn-ler-qr" onClick={handleLerQRCode}>
-          Ler QR code
-        </button>
+        {/* Removido o botão de Ler QR Code, a tela fica mais limpa e direta */}
 
-        <div className="aluno-card">
+        <div className="aluno-card" style={{ marginTop: "1rem" }}>
           <h3>Histórico de presença</h3>
 
           <div style={{ width: "100%" }}>
-            {historicoPresenca.map((data, index) => (
-              <div className="presenca-item" key={index}>
-                <span>{data}</span>
-                <span className="icone-check">✔</span>
-              </div>
-            ))}
+            {historicoPresenca.length > 0 ? (
+              historicoPresenca.map((presenca, index) => (
+                <div className="presenca-item" key={index}>
+                  <span>{formatarDataHora(presenca.data_hora)}</span>
+                  <span className="icone-check">✔</span>
+                </div>
+              ))
+            ) : (
+              <p style={{ textAlign: "center", color: "#666" }}>
+                Nenhuma presença registrada ainda.
+              </p>
+            )}
           </div>
         </div>
       </main>

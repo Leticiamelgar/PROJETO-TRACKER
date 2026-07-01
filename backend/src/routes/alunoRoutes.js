@@ -2,12 +2,13 @@ const express = require("express");
 const router = express.Router();
 const db = require("../config/db");
 
-// LISTAR ALUNOS
+// LISTAR ALUNOS COM CONTADOR DE PRESENÇAS
 router.get("/listar", async (req, res) => {
   try {
     const query = `
       SELECT u.id, u.nome, u.email, 
-             a.data_nascimento, a.data_ultima_graduacao, a.faixa, a.grau, a.genero
+             a.data_nascimento, a.data_ultima_graduacao, a.faixa, a.grau, a.genero,
+             (SELECT COUNT(*) FROM presenca_frequencias WHERE aluno_id = u.id) as total_presencas
       FROM usuarios u
       INNER JOIN alunos a ON u.id = a.usuario_id
       WHERE u.perfil = $1
@@ -56,7 +57,7 @@ router.post("/cadastrar", async (req, res) => {
   }
 });
 
-// GRADUAR ALUNO (NOVA ROTA)
+// GRADUAR ALUNO
 router.put("/graduar/:id", async (req, res) => {
   const { id } = req.params;
   try {
@@ -77,6 +78,50 @@ router.put("/graduar/:id", async (req, res) => {
   } catch (error) {
     console.error("Erro ao graduar aluno:", error);
     res.status(500).json({ error: "Erro ao processar graduação." });
+  }
+});
+
+// BUSCAR UM ÚNICO ALUNO POR ID (PARA O PAINEL DO ALUNO)
+router.get("/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const query = `
+      SELECT u.id, u.nome, u.email, 
+             a.data_nascimento, a.data_ultima_graduacao, a.faixa, a.grau, a.genero,
+             (SELECT COUNT(*) FROM presenca_frequencias WHERE aluno_id = u.id) as total_presencas
+      FROM usuarios u
+      INNER JOIN alunos a ON u.id = a.usuario_id
+      WHERE u.id = $1
+    `;
+    const result = await db.query(query, [id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Aluno não encontrado." });
+    }
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error("Erro ao buscar aluno específico:", error);
+    res.status(500).json({ error: "Erro ao buscar dados do aluno." });
+  }
+});
+
+// BUSCAR HISTÓRICO DE PRESENÇAS DO ALUNO
+router.get("/presencas/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const query = `
+      SELECT data_hora 
+      FROM presenca_frequencias 
+      WHERE aluno_id = $1 
+      ORDER BY data_hora DESC 
+      LIMIT 10
+    `;
+    const result = await db.query(query, [id]);
+    res.json(result.rows);
+  } catch (error) {
+    console.error("Erro ao buscar histórico de presenças:", error);
+    res.status(500).json({ error: "Erro ao buscar histórico." });
   }
 });
 
@@ -101,6 +146,22 @@ router.put("/:id", async (req, res) => {
   } catch (error) {
     console.error("Erro ao atualizar aluno:", error);
     res.status(500).json({ error: "Erro ao atualizar dados." });
+  }
+});
+
+// REGISTRAR PRESENÇA PELO PROFESSOR (NOVA ROTA)
+router.post("/registrar-presenca/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    await db.query(
+      `INSERT INTO presenca_frequencias (aluno_id, data_hora, status) 
+       VALUES ($1, NOW(), 'Presente')`,
+      [id],
+    );
+    res.status(201).json({ mensagem: "Presença registrada com sucesso!" });
+  } catch (error) {
+    console.error("Erro ao registrar presença:", error);
+    res.status(500).json({ error: "Erro ao registrar presença no banco." });
   }
 });
 

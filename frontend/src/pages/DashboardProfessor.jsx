@@ -2,40 +2,41 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 import "./Dashboard.css";
-import QRCode from 'react-qr-code'; 
-
 import logoGB from "../assets/logo.png";
 
 export default function DashboardProfessor() {
   const [alunos, setAlunos] = useState([]);
   const navigate = useNavigate();
 
-  // Estados do Modal do QR Code
-  const [modalAberto, setModalAberto] = useState(false);
-  const [qrToken, setQrToken] = useState('');
-
   useEffect(() => {
-    const buscarAlunos = async () => {
-      try {
-        const resposta = await api.get("/alunos/listar");
-        setAlunos(resposta.data);
-      } catch (err) {
-        console.error("Erro ao buscar alunos", err);
-      }
-    };
     buscarAlunos();
   }, []);
+
+  const buscarAlunos = async () => {
+    try {
+      const resposta = await api.get("/alunos/listar");
+      setAlunos(resposta.data);
+    } catch (err) {
+      console.error("Erro ao buscar alunos", err);
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("@JJTrack:usuario");
     navigate("/");
   };
 
-  // Função que gera o token e abre a tela do QR Code
-  const handleGerarQRCode = () => {
-    const tokenTemporario = `sessao-treino-${Date.now()}`;
-    setQrToken(tokenTemporario);
-    setModalAberto(true);
+  // Função para dar presença ao clicar no botão
+  const handleDarPresenca = async (id, nome) => {
+    try {
+      await api.post(`/alunos/registrar-presenca/${id}`);
+      alert(`✅ Presença registrada para ${nome}!`);
+      // Opcional: Atualiza a lista para refletir os números reais caso queira
+      buscarAlunos();
+    } catch (error) {
+      console.error("Erro ao registrar presença", error);
+      alert("Erro ao tentar registrar a presença.");
+    }
   };
 
   return (
@@ -53,10 +54,16 @@ export default function DashboardProfessor() {
 
         <nav className="nav-menu">
           <button className="nav-item active">Início</button>
-          <button className="nav-item" onClick={() => navigate("/professor/agenda")}>
+          <button
+            className="nav-item"
+            onClick={() => navigate("/professor/agenda")}
+          >
             Agenda
           </button>
-          <button className="nav-item" onClick={() => navigate("/professor/graduacoes")}>
+          <button
+            className="nav-item"
+            onClick={() => navigate("/professor/graduacoes")}
+          >
             Graduações
           </button>
           <button
@@ -68,7 +75,7 @@ export default function DashboardProfessor() {
         </nav>
       </header>
 
-      {/* CONTEÚDO PRINCIPAL (CARDS E QR CODE) */}
+      {/* CONTEÚDO PRINCIPAL */}
       <main className="main-content">
         <div className="cards-row">
           <div className="card">
@@ -78,40 +85,91 @@ export default function DashboardProfessor() {
 
           <div className="card">
             <h3>Presenças Hoje</h3>
-            <p className="value">8</p> {/* Fixo por enquanto */}
+            <p className="value">8</p>{" "}
+            {/* Fixo por enquanto, conectaremos depois */}
           </div>
 
           <div className="card">
             <h3>Faltas</h3>
-            <p className="value">2</p> {/* Fixo por enquanto */}
+            <p className="value">2</p>{" "}
+            {/* Fixo por enquanto, conectaremos depois */}
           </div>
         </div>
 
-        {/* BOTÃO ATUALIZADO */}
-        <button
-          className="btn-qr btn-gerar-qrcode" 
-          onClick={handleGerarQRCode}
+        {/* LISTA DE CHAMADA DIGITAL */}
+        <div
+          style={{
+            marginTop: "2rem",
+            background: "#fff",
+            padding: "2rem",
+            borderRadius: "15px",
+            boxShadow: "0 4px 10px rgba(0,0,0,0.05)",
+            width: "100%",
+            maxWidth: "800px",
+            alignSelf: "center",
+          }}
         >
-          Gerar QR-Code
-        </button>
-      </main>
+          <h2
+            style={{
+              marginBottom: "1.5rem",
+              textAlign: "center",
+              color: "#333",
+            }}
+          >
+            Lista de Chamada
+          </h2>
 
-      {/* JANELA FLUTUANTE (MODAL) DO QR CODE */}
-      {modalAberto && (
-        <div className="modal-overlay" onClick={() => setModalAberto(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h3>Escaneie para registrar presença</h3>
-            
-            <QRCode value={qrToken} size={250} fgColor="#000000" bgColor="#FFFFFF" />
-            
-            <p style={{ fontSize: '0.8rem', color: '#888', marginTop: '1rem' }}>Token válido para a aula atual.</p>
-            
-            <button className="btn-fechar-modal" onClick={() => setModalAberto(false)}>
-              Fechar
-            </button>
-          </div>
+          {alunos.length > 0 ? (
+            <div
+              style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+            >
+              {alunos.map((aluno) => (
+                <div
+                  key={aluno.id}
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    padding: "1rem",
+                    borderBottom: "1px solid #eee",
+                  }}
+                >
+                  <div style={{ display: "flex", flexDirection: "column" }}>
+                    <strong style={{ fontSize: "1.1rem", color: "#1a1a1a" }}>
+                      {aluno.nome}
+                    </strong>
+                    <span style={{ fontSize: "0.85rem", color: "#666" }}>
+                      Faixa {aluno.faixa} - {aluno.grau} graus
+                    </span>
+                  </div>
+
+                  <button
+                    onClick={() => handleDarPresenca(aluno.id, aluno.nome)}
+                    style={{
+                      background: "#27ae60",
+                      color: "white",
+                      border: "none",
+                      padding: "0.6rem 1.2rem",
+                      borderRadius: "20px",
+                      fontWeight: "bold",
+                      cursor: "pointer",
+                      transition: "background 0.2s ease-in-out",
+                    }}
+                    onMouseOver={(e) => (e.target.style.background = "#219653")}
+                    onMouseOut={(e) => (e.target.style.background = "#27ae60")}
+                  >
+                    Dar Presença
+                  </button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p style={{ textAlign: "center", color: "#666" }}>
+              Nenhum aluno matriculado ainda.
+            </p>
+          )}
         </div>
-      )}
+      </main>
     </div>
   );
 }
