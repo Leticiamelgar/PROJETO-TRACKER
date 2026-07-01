@@ -2,17 +2,12 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 import "./Dashboard.css";
-import QRCode from 'react-qr-code'; 
 
 import logoGB from "../assets/logo.png";
 
 export default function DashboardProfessor() {
   const [alunos, setAlunos] = useState([]);
   const navigate = useNavigate();
-
-  // Estados do Modal do QR Code
-  const [modalAberto, setModalAberto] = useState(false);
-  const [qrToken, setQrToken] = useState('');
 
   useEffect(() => {
     const buscarAlunos = async () => {
@@ -29,13 +24,6 @@ export default function DashboardProfessor() {
   const handleLogout = () => {
     localStorage.removeItem("@JJTrack:usuario");
     navigate("/");
-  };
-
-  // Função que gera o token e abre a tela do QR Code
-  const handleGerarQRCode = () => {
-    const tokenTemporario = `sessao-treino-${Date.now()}`;
-    setQrToken(tokenTemporario);
-    setModalAberto(true);
   };
 
   return (
@@ -68,7 +56,7 @@ export default function DashboardProfessor() {
         </nav>
       </header>
 
-      {/* CONTEÚDO PRINCIPAL (CARDS E QR CODE) */}
+      {/* CONTEÚDO PRINCIPAL */}
       <main className="main-content">
         <div className="cards-row">
           <div className="card">
@@ -78,40 +66,16 @@ export default function DashboardProfessor() {
 
           <div className="card">
             <h3>Presenças Hoje</h3>
-            <p className="value">8</p> {/* Fixo por enquanto */}
+            <p className="value">0</p>
           </div>
 
           <div className="card">
             <h3>Faltas</h3>
-            <p className="value">2</p> {/* Fixo por enquanto */}
+            <p className="value">0</p>
           </div>
         </div>
 
-        {/* BOTÃO ATUALIZADO */}
-        <button
-          className="btn-qr btn-gerar-qrcode" 
-          onClick={handleGerarQRCode}
-        >
-          Gerar QR-Code
-        </button>
       </main>
-
-      {/* JANELA FLUTUANTE (MODAL) DO QR CODE */}
-      {modalAberto && (
-        <div className="modal-overlay" onClick={() => setModalAberto(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h3>Escaneie para registrar presença</h3>
-            
-            <QRCode value={qrToken} size={250} fgColor="#000000" bgColor="#FFFFFF" />
-            
-            <p style={{ fontSize: '0.8rem', color: '#888', marginTop: '1rem' }}>Token válido para a aula atual.</p>
-            
-            <button className="btn-fechar-modal" onClick={() => setModalAberto(false)}>
-              Fechar
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
