@@ -31,6 +31,8 @@ export default function GraduacaoAluno() {
     const fetchDadosAluno = async () => {
       try {
         const response = await api.get(`/alunos/${dados.id}`);
+        // Log para debug caso os dados não apareçam na tela
+        console.log("Dados recebidos do banco:", response.data);
         setAlunoDb(response.data);
       } catch (error) {
         console.error("Erro ao carregar dados do aluno:", error);
@@ -44,14 +46,28 @@ export default function GraduacaoAluno() {
 
   if (carregando)
     return (
-      <div style={{ textAlign: "center", marginTop: "50px" }}>
-        Carregando...
+      <div
+        style={{
+          textAlign: "center",
+          marginTop: "50px",
+          fontSize: "1.2rem",
+          fontWeight: "bold",
+        }}
+      >
+        🥋 Amarrando a faixa... (Carregando)
       </div>
     );
   if (!alunoDb)
     return (
-      <div style={{ textAlign: "center", marginTop: "50px" }}>
-        Erro ao carregar dados.
+      <div
+        style={{
+          textAlign: "center",
+          marginTop: "50px",
+          color: "red",
+          fontWeight: "bold",
+        }}
+      >
+        {mensagemErro || "Erro ao carregar os dados do aluno."}
       </div>
     );
 
