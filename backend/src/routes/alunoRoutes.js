@@ -149,7 +149,7 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-// REGISTRAR PRESENÇA PELO PROFESSOR (NOVA ROTA)
+// REGISTRAR PRESENÇA PELO PROFESSOR
 router.post("/registrar-presenca/:id", async (req, res) => {
   const { id } = req.params;
   try {
@@ -162,6 +162,22 @@ router.post("/registrar-presenca/:id", async (req, res) => {
   } catch (error) {
     console.error("Erro ao registrar presença:", error);
     res.status(500).json({ error: "Erro ao registrar presença no banco." });
+  }
+});
+
+// BUSCAR ESTATÍSTICAS DO DASHBOARD (NOVA ROTA)
+router.get("/estatisticas/hoje", async (req, res) => {
+  try {
+    const query = `
+      SELECT COUNT(DISTINCT aluno_id) as presencas_hoje 
+      FROM presenca_frequencias 
+      WHERE DATE(data_hora) = CURRENT_DATE
+    `;
+    const result = await db.query(query);
+    res.json({ presencasHoje: parseInt(result.rows[0].presencas_hoje || 0) });
+  } catch (error) {
+    console.error("Erro ao buscar estatísticas:", error);
+    res.status(500).json({ error: "Erro ao buscar estatísticas." });
   }
 });
 

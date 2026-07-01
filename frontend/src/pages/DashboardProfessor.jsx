@@ -7,18 +7,24 @@ import logoGB from "../assets/logo.png";
 
 export default function DashboardProfessor() {
   const [alunos, setAlunos] = useState([]);
+  const [presencasHoje, setPresencasHoje] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
-    buscarAlunos();
+    buscarDadosPainel();
   }, []);
 
-  const buscarAlunos = async () => {
+  const buscarDadosPainel = async () => {
     try {
-      const resposta = await api.get("/alunos/listar");
-      setAlunos(resposta.data);
+      // Busca a lista de alunos
+      const respostaAlunos = await api.get("/alunos/listar");
+      setAlunos(respostaAlunos.data);
+
+      // Busca as presenças de hoje
+      const respostaEstatisticas = await api.get("/alunos/estatisticas/hoje");
+      setPresencasHoje(respostaEstatisticas.data.presencasHoje);
     } catch (err) {
-      console.error("Erro ao buscar alunos", err);
+      console.error("Erro ao buscar dados do painel", err);
     }
   };
 
@@ -27,18 +33,21 @@ export default function DashboardProfessor() {
     navigate("/");
   };
 
-  // Função para dar presença ao clicar no botão
   const handleDarPresenca = async (id, nome) => {
     try {
       await api.post(`/alunos/registrar-presenca/${id}`);
       alert(`✅ Presença registrada para ${nome}!`);
-      // Opcional: Atualiza a lista para refletir os números reais caso queira
-      buscarAlunos();
+      // Atualiza a lista e os cards automaticamente
+      buscarDadosPainel();
     } catch (error) {
       console.error("Erro ao registrar presença", error);
       alert("Erro ao tentar registrar a presença.");
     }
   };
+
+  // Matemática dos cards dinâmicos
+  const totalAlunos = alunos.length;
+  const faltasHoje = Math.max(0, totalAlunos - presencasHoje); // Evita número negativo
 
   return (
     <div className="dashboard-container">
@@ -81,19 +90,21 @@ export default function DashboardProfessor() {
         <div className="cards-row">
           <div className="card">
             <h3>Total de alunos</h3>
-            <p className="value">{alunos.length}</p>
+            <p className="value">{totalAlunos}</p>
           </div>
 
           <div className="card">
             <h3>Presenças Hoje</h3>
-            <p className="value">8</p>{" "}
-            {/* Fixo por enquanto, conectaremos depois */}
+            <p className="value" style={{ color: "#27ae60" }}>
+              {presencasHoje}
+            </p>
           </div>
 
           <div className="card">
             <h3>Faltas</h3>
-            <p className="value">2</p>{" "}
-            {/* Fixo por enquanto, conectaremos depois */}
+            <p className="value" style={{ color: "#d32f2f" }}>
+              {faltasHoje}
+            </p>
           </div>
         </div>
 
