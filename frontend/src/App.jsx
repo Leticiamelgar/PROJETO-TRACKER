@@ -6,6 +6,10 @@ import Alunos from "./pages/Alunos";
 import Agenda from "./pages/Agenda";
 import Graduacoes from "./pages/Graduacoes";
 
+// Importações das novas páginas do Aluno
+import AgendaAluno from "./pages/AgendaAluno";
+import GraduacaoAluno from "./pages/GraduacaoAluno";
+
 function App() {
   return (
     <BrowserRouter>
@@ -27,6 +31,10 @@ function App() {
 
         {/* <-- 3. NOVA ROTA PARA A TELA DE GRADUAÇÕES --> */}
         <Route path="/professor/graduacoes" element={<Graduacoes />} />
+
+        {/* <-- 4. NOVAS ROTAS DO ALUNO --> */}
+        <Route path="/aluno/agenda" element={<AgendaAluno />} />
+        <Route path="/aluno/graduacao" element={<GraduacaoAluno />} />
 
         {/* Redireciona qualquer rota inexistente (URL digitada errada) de volta para o login */}
         <Route path="*" element={<Navigate to="/" />} />
