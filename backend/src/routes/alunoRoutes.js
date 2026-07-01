@@ -58,43 +58,39 @@ router.post("/cadastrar", async (req, res) => {
 });
 
 // GRADUAR ALUNO COM LÓGICA DE PROMOÇÃO
+// GRADUAR ALUNO (Alterado: Promove faixa e reseta grau para 0)
 router.put("/graduar/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    // Busca a situação atual
     const aluno = await db.query(
       "SELECT faixa, grau FROM alunos WHERE usuario_id = $1",
-      [id],
+      [id]
     );
+
     if (aluno.rows.length === 0)
       return res.status(404).json({ error: "Aluno não encontrado." });
 
-    let { faixa, grau } = aluno.rows[0];
-    let novoGrau = parseInt(grau) + 1;
-    let novaFaixa = faixa;
+    let { faixa } = aluno.rows[0];
+    const faixas = ["Branca", "Azul", "Roxa", "Marrom", "Preta"];
+    const indexAtual = faixas.indexOf(faixa);
 
-    // Lógica de promoção (se grau > 4, troca a faixa e reseta grau)
-    if (novoGrau > 4) {
-      const faixas = ["Branca", "Azul", "Roxa", "Marrom", "Preta"];
-      const indexAtual = faixas.indexOf(faixa);
-
-      if (indexAtual !== -1 && indexAtual < faixas.length - 1) {
-        novaFaixa = faixas[indexAtual + 1];
-        novoGrau = 0; // Reset do grau ao trocar de faixa
-      } else {
-        novoGrau = 4; // Se já for Preta, mantemos no limite de 4
-      }
+    if (indexAtual !== -1 && indexAtual < faixas.length - 1) {
+      const novaFaixa = faixas[indexAtual + 1];
+      
+      // ALTERAÇÃO AQUI: Setamos faixa = $1, grau = 0 e a data
+      await db.query(
+        `UPDATE alunos 
+         SET data_ultima_graduacao = CURRENT_DATE, 
+             faixa = $1, 
+             grau = 0 
+         WHERE usuario_id = $2`,
+        [novaFaixa, id]
+      );
+      
+      res.json({ mensagem: "Faixa atualizada e graus resetados com sucesso!", novaFaixa });
+    } else {
+      res.status(400).json({ error: "Aluno já possui a faixa máxima (Preta)." });
     }
-
-    await db.query(
-      `UPDATE alunos SET data_ultima_graduacao = CURRENT_DATE, faixa = $1, grau = $2 WHERE usuario_id = $3`,
-      [novaFaixa, novoGrau, id],
-    );
-    res.json({
-      mensagem: "Graduação realizada com sucesso!",
-      novaFaixa,
-      novoGrau,
-    });
   } catch (error) {
     console.error("Erro ao graduar aluno:", error);
     res.status(500).json({ error: "Erro ao processar graduação." });
