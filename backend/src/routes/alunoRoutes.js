@@ -57,31 +57,51 @@ router.post("/cadastrar", async (req, res) => {
   }
 });
 
-// GRADUAR ALUNO
+// GRADUAR ALUNO COM LÓGICA DE PROMOÇÃO
 router.put("/graduar/:id", async (req, res) => {
   const { id } = req.params;
   try {
+    // Busca a situação atual
     const aluno = await db.query(
-      "SELECT grau FROM alunos WHERE usuario_id = $1",
+      "SELECT faixa, grau FROM alunos WHERE usuario_id = $1",
       [id],
     );
     if (aluno.rows.length === 0)
       return res.status(404).json({ error: "Aluno não encontrado." });
 
-    const novoGrau = parseInt(aluno.rows[0].grau) + 1;
+    let { faixa, grau } = aluno.rows[0];
+    let novoGrau = parseInt(grau) + 1;
+    let novaFaixa = faixa;
+
+    // Lógica de promoção (se grau > 4, troca a faixa e reseta grau)
+    if (novoGrau > 4) {
+      const faixas = ["Branca", "Azul", "Roxa", "Marrom", "Preta"];
+      const indexAtual = faixas.indexOf(faixa);
+
+      if (indexAtual !== -1 && indexAtual < faixas.length - 1) {
+        novaFaixa = faixas[indexAtual + 1];
+        novoGrau = 0; // Reset do grau ao trocar de faixa
+      } else {
+        novoGrau = 4; // Se já for Preta, mantemos no limite de 4
+      }
+    }
 
     await db.query(
-      `UPDATE alunos SET data_ultima_graduacao = CURRENT_DATE, grau = $1 WHERE usuario_id = $2`,
-      [novoGrau, id],
+      `UPDATE alunos SET data_ultima_graduacao = CURRENT_DATE, faixa = $1, grau = $2 WHERE usuario_id = $3`,
+      [novaFaixa, novoGrau, id],
     );
-    res.json({ mensagem: "Graduação realizada com sucesso!", novoGrau });
+    res.json({
+      mensagem: "Graduação realizada com sucesso!",
+      novaFaixa,
+      novoGrau,
+    });
   } catch (error) {
     console.error("Erro ao graduar aluno:", error);
     res.status(500).json({ error: "Erro ao processar graduação." });
   }
 });
 
-// BUSCAR UM ÚNICO ALUNO POR ID (PARA O PAINEL DO ALUNO)
+// BUSCAR UM ÚNICO ALUNO POR ID
 router.get("/:id", async (req, res) => {
   const { id } = req.params;
   try {
@@ -106,7 +126,7 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-// BUSCAR HISTÓRICO DE PRESENÇAS DO ALUNO
+// BUSCAR HISTÓRICO DE PRESENÇAS
 router.get("/presencas/:id", async (req, res) => {
   const { id } = req.params;
   try {
@@ -165,7 +185,7 @@ router.post("/registrar-presenca/:id", async (req, res) => {
   }
 });
 
-// BUSCAR ESTATÍSTICAS DO DASHBOARD (NOVA ROTA)
+// BUSCAR ESTATÍSTICAS
 router.get("/estatisticas/hoje", async (req, res) => {
   try {
     const query = `

@@ -43,7 +43,6 @@ export default function Graduacoes() {
     }
   };
 
-  // Lógica unificada para definir o tempo necessário em meses
   const getTempoNecessario = (aluno) => {
     if (aluno.faixa === "Branca") return 12;
     if (aluno.faixa === "Azul") return 24;
@@ -61,22 +60,22 @@ export default function Graduacoes() {
       (hoje.getMonth() - ultima.getMonth());
     const tempoNecessario = getTempoNecessario(aluno);
 
+    // CORREÇÃO: Math.max(0, ...) garante que nunca fique negativo
     const progresso = Math.min(
       100,
-      Math.floor((diffMeses / tempoNecessario) * 100),
+      Math.max(0, Math.floor((diffMeses / tempoNecessario) * 100)),
     );
     const apto = progresso >= 100;
     return { progresso, apto };
   };
 
-  // Nova função para calcular a data prevista
   const calcularDataPrevista = (aluno) => {
     const ultima = new Date(aluno.data_ultima_graduacao);
     const tempoNecessario = getTempoNecessario(aluno);
 
-    // Adiciona os meses à data da última graduação
-    ultima.setMonth(ultima.getMonth() + tempoNecessario);
-    return ultima.toLocaleDateString("pt-BR");
+    const dataPrevista = new Date(ultima);
+    dataPrevista.setMonth(ultima.getMonth() + tempoNecessario);
+    return dataPrevista.toLocaleDateString("pt-BR");
   };
 
   const handleLogout = () => {
