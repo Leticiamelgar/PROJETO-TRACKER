@@ -14,10 +14,6 @@ export default function Graduacoes() {
   const [filtroAtivo, setFiltroAtivo] = useState("Todos");
   const [mostrarFiltros, setMostrarFiltros] = useState(false);
 
-  useEffect(() => {
-    fetchAlunos();
-  }, []);
-
   const fetchAlunos = async () => {
     try {
       const response = await api.get("/alunos/listar");
@@ -26,6 +22,19 @@ export default function Graduacoes() {
       console.error("Erro ao buscar alunos:", error);
     }
   };
+
+  useEffect(() => {
+    const carregarAlunos = async () => {
+      try {
+        const response = await api.get("/alunos/listar");
+        setAlunos(response.data);
+      } catch (error) {
+        console.error("Erro ao buscar alunos:", error);
+      }
+    };
+
+    carregarAlunos();
+  }, []);
 
   const handleGraduar = async (id) => {
     if (
@@ -37,7 +46,7 @@ export default function Graduacoes() {
         await api.put(`/alunos/graduar/${id}`);
         alert("Graduação realizada com sucesso!");
         fetchAlunos();
-      } catch (error) {
+      } catch {
         alert("Erro ao realizar graduação.");
       }
     }

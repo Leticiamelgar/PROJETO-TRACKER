@@ -29,7 +29,16 @@ export default function Alunos() {
   };
 
   useEffect(() => {
-    fetchAlunos();
+    const carregarAlunos = async () => {
+      try {
+        const response = await api.get("/alunos/listar");
+        setListaAlunos(response.data);
+      } catch (error) {
+        console.error("Erro ao buscar alunos:", error);
+      }
+    };
+
+    carregarAlunos();
   }, []);
 
   const handleLogout = () => {
@@ -80,7 +89,7 @@ export default function Alunos() {
       try {
         await api.delete(`/alunos/${id}`);
         fetchAlunos();
-      } catch (error) {
+      } catch {
         alert("Erro ao excluir aluno.");
       }
     }

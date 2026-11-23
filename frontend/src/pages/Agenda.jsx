@@ -19,8 +19,21 @@ export default function Agenda() {
 
   // --- CICLO DE VIDA ---
   useEffect(() => {
-    if (!localStorage.getItem("@JJTrack:usuario")) navigate("/");
-    fetchAgenda();
+    if (!localStorage.getItem("@JJTrack:usuario")) {
+      navigate("/");
+      return;
+    }
+
+    const carregarAgenda = async () => {
+      try {
+        const { data } = await api.get("/agenda/listar");
+        setListaAgenda(data);
+      } catch (err) {
+        console.error("Erro ao buscar agenda:", err);
+      }
+    };
+
+    carregarAgenda();
   }, [navigate]);
 
   // --- LÓGICA DE DADOS ---
@@ -28,7 +41,9 @@ export default function Agenda() {
     try {
       const { data } = await api.get("/agenda/listar");
       setListaAgenda(data);
-    } catch (err) { console.error("Erro ao buscar agenda:", err); }
+    } catch (err) {
+      console.error("Erro ao buscar agenda:", err);
+    }
   };
 
   // --- HANDLERS ---
@@ -40,17 +55,26 @@ export default function Agenda() {
       else await api.post("/agenda/cadastrar", dados);
       limparFormulario();
       fetchAgenda();
-    } catch (err) { alert(err.response?.data?.error || "Erro ao salvar."); }
+    } catch (err) {
+      alert(err.response?.data?.error || "Erro ao salvar.");
+    }
   };
 
   const limparFormulario = () => {
-    setDiaSemana(""); setHorario(""); setTipoAula(""); setEditandoId(null);
+    setDiaSemana("");
+    setHorario("");
+    setTipoAula("");
+    setEditandoId(null);
   };
 
   const handleExcluir = async (id) => {
     if (window.confirm("Remover este horário?")) {
-      try { await api.delete(`/agenda/${id}`); fetchAgenda(); }
-      catch (err) { alert("Erro ao excluir."); }
+      try {
+        await api.delete(`/agenda/${id}`);
+        fetchAgenda();
+      } catch {
+        alert("Erro ao excluir.");
+      }
     }
   };
 
@@ -58,16 +82,36 @@ export default function Agenda() {
   return (
     <div className="dashboard-container">
       <header className="top-header">
-        <button className="btn-sair" onClick={() => { localStorage.removeItem("@JJTrack:usuario"); navigate("/"); }}>Sair</button>
+        <button
+          className="btn-sair"
+          onClick={() => {
+            localStorage.removeItem("@JJTrack:usuario");
+            navigate("/");
+          }}
+        >
+          Sair
+        </button>
         <div className="logo-container">
           <img src={logoGB} alt="Logo" className="logo-img" />
           <h2>Gracie Barra - Centro</h2>
         </div>
         <nav className="nav-menu">
-          <button className="nav-item" onClick={() => navigate("/professor")}>Início</button>
+          <button className="nav-item" onClick={() => navigate("/professor")}>
+            Início
+          </button>
           <button className="nav-item active">Agenda</button>
-          <button className="nav-item" onClick={() => navigate("/professor/graduacoes")}>Graduações</button>
-          <button className="nav-item" onClick={() => navigate("/professor/alunos")}>Alunos</button>
+          <button
+            className="nav-item"
+            onClick={() => navigate("/professor/graduacoes")}
+          >
+            Graduações
+          </button>
+          <button
+            className="nav-item"
+            onClick={() => navigate("/professor/alunos")}
+          >
+            Alunos
+          </button>
         </nav>
       </header>
 
@@ -77,25 +121,48 @@ export default function Agenda() {
           <form onSubmit={handleSalvar} className="agenda-form-row">
             <div className="agenda-form-group">
               <label>Dia</label>
-              <select value={diaSemana} onChange={(e) => setDiaSemana(e.target.value)} required>
+              <select
+                value={diaSemana}
+                onChange={(e) => setDiaSemana(e.target.value)}
+                required
+              >
                 <option value="">Selecione...</option>
-                {diasDaSemana.map((d) => <option key={d} value={d}>{d}</option>)}
+                {diasDaSemana.map((d) => (
+                  <option key={d} value={d}>
+                    {d}
+                  </option>
+                ))}
               </select>
             </div>
             <div className="agenda-form-group">
               <label>Horário</label>
-              <input type="time" value={horario} onChange={(e) => setHorario(e.target.value)} required />
+              <input
+                type="time"
+                value={horario}
+                onChange={(e) => setHorario(e.target.value)}
+                required
+              />
             </div>
             <div className="agenda-form-group">
               <label>Tipo</label>
-              <select value={tipoAula} onChange={(e) => setTipoAula(e.target.value)} required>
+              <select
+                value={tipoAula}
+                onChange={(e) => setTipoAula(e.target.value)}
+                required
+              >
                 <option value="">Selecione...</option>
-                {["GB 1 e 2", "GB F", "NO-GI", "GB 1", "GB 2"].map(t => <option key={t} value={t}>{t}</option>)}
+                {["GB 1 e 2", "GB F", "NO-GI", "GB 1", "GB 2"].map((t) => (
+                  <option key={t} value={t}>
+                    {t}
+                  </option>
+                ))}
               </select>
             </div>
 
-            <div className="agenda-form-group" style={{ flex: '0 0 auto' }}>
-              <button type="submit" className="btn-submit btn-add">{editandoId ? "Salvar" : "Adicionar"}</button>
+            <div className="agenda-form-group" style={{ flex: "0 0 auto" }}>
+              <button type="submit" className="btn-submit btn-add">
+                {editandoId ? "Salvar" : "Adicionar"}
+              </button>
             </div>
           </form>
         </div>
@@ -104,16 +171,30 @@ export default function Agenda() {
           {diasDaSemana.map((dia) => (
             <div className="dia-coluna" key={dia}>
               <h3>{dia}</h3>
-              {listaAgenda.filter(a => a.dia_semana === dia).map(aula => (
-                <div key={aula.id} className={`aula-card tipo-${aula.tipo_aula.replace(/\s/g, '').toLowerCase()}`}>
-                  <div className="aula-horario">{aula.horario}</div>
-                  <div className="aula-tipo">{aula.tipo_aula}</div>
-                  <div className="aula-acoes">
-                    <button onClick={() => { setEditandoId(aula.id); setDiaSemana(aula.dia_semana); setHorario(aula.horario); setTipoAula(aula.tipo_aula); }}>Editar</button>
-                    <button onClick={() => handleExcluir(aula.id)}>X</button>
+              {listaAgenda
+                .filter((a) => a.dia_semana === dia)
+                .map((aula) => (
+                  <div
+                    key={aula.id}
+                    className={`aula-card tipo-${aula.tipo_aula.replace(/\s/g, "").toLowerCase()}`}
+                  >
+                    <div className="aula-horario">{aula.horario}</div>
+                    <div className="aula-tipo">{aula.tipo_aula}</div>
+                    <div className="aula-acoes">
+                      <button
+                        onClick={() => {
+                          setEditandoId(aula.id);
+                          setDiaSemana(aula.dia_semana);
+                          setHorario(aula.horario);
+                          setTipoAula(aula.tipo_aula);
+                        }}
+                      >
+                        Editar
+                      </button>
+                      <button onClick={() => handleExcluir(aula.id)}>X</button>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
             </div>
           ))}
         </div>

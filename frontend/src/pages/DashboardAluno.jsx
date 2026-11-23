@@ -6,7 +6,6 @@ import logoGB from "../assets/logo.png";
 
 export default function DashboardAluno() {
   const navigate = useNavigate();
-  const [dados, setDados] = useState(null);
   const [historicoPresenca, setHistoricoPresenca] = useState([]);
 
   useEffect(() => {
@@ -17,7 +16,6 @@ export default function DashboardAluno() {
     }
 
     const dadosUsuario = JSON.parse(usuarioLogado);
-    setDados(dadosUsuario);
 
     const fetchPresencas = async () => {
       try {

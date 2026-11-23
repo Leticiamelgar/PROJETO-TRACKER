@@ -8,6 +8,7 @@ export default function GraduacaoAluno() {
   const navigate = useNavigate();
   const [alunoDb, setAlunoDb] = useState(null);
   const [carregando, setCarregando] = useState(true);
+  const [mensagemErro, setMensagemErro] = useState("");
 
   // Regra de tempo igual à do professor
   const getTempoNecessario = (faixa, grau) => {
@@ -36,6 +37,7 @@ export default function GraduacaoAluno() {
         setAlunoDb(response.data);
       } catch (error) {
         console.error("Erro ao carregar dados do aluno:", error);
+        setMensagemErro("Erro ao carregar os dados do aluno.");
       } finally {
         setCarregando(false);
       }

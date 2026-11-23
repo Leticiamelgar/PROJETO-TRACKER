@@ -10,10 +10,6 @@ export default function DashboardProfessor() {
   const [presencasHoje, setPresencasHoje] = useState(0);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    buscarDadosPainel();
-  }, []);
-
   const buscarDadosPainel = async () => {
     try {
       // Busca a lista de alunos
@@ -27,6 +23,24 @@ export default function DashboardProfessor() {
       console.error("Erro ao buscar dados do painel", err);
     }
   };
+
+  useEffect(() => {
+    const carregarDadosPainel = async () => {
+      try {
+        // Busca a lista de alunos
+        const respostaAlunos = await api.get("/alunos/listar");
+        setAlunos(respostaAlunos.data);
+
+        // Busca as presenças de hoje
+        const respostaEstatisticas = await api.get("/alunos/estatisticas/hoje");
+        setPresencasHoje(respostaEstatisticas.data.presencasHoje);
+      } catch (err) {
+        console.error("Erro ao buscar dados do painel", err);
+      }
+    };
+
+    carregarDadosPainel();
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("@JJTrack:usuario");
