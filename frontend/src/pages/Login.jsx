@@ -42,14 +42,14 @@ export default function Login() {
         
         {erro && <p style={{ color: 'red', fontSize: '0.85rem', marginBottom: '1rem' }}>{erro}</p>}
 
-        <label style={{ marginBottom: '0.5rem', fontWeight: 'bold' }}>E-mail</label>
-        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required style={{ padding: '0.5rem', marginBottom: '1rem', borderRadius: '4px', border: '1px solid #ccc' }} />
+        <label htmlFor="email" style={{ marginBottom: '0.5rem', fontWeight: 'bold' }}>E-mail</label>
+        <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required style={{ padding: '0.5rem', marginBottom: '1rem', borderRadius: '4px', border: '1px solid #ccc' }} />
 
-        <label style={{ marginBottom: '0.5rem', fontWeight: 'bold' }}>Senha</label>
-        <input type="password" value={senha} onChange={(e) => setSenha(e.target.value)} required style={{ padding: '0.5rem', marginBottom: '1rem', borderRadius: '4px', border: '1px solid #ccc' }} />
+        <label htmlFor="senha" style={{ marginBottom: '0.5rem', fontWeight: 'bold' }}>Senha</label>
+        <input id="senha" type="password" value={senha} onChange={(e) => setSenha(e.target.value)} required style={{ padding: '0.5rem', marginBottom: '1rem', borderRadius: '4px', border: '1px solid #ccc' }} />
 
-        <label style={{ marginBottom: '0.5rem', fontWeight: 'bold' }}>Perfil</label>
-        <select value={perfil} onChange={(e) => setPerfil(e.target.value)} style={{ padding: '0.5rem', marginBottom: '1.5rem', borderRadius: '4px', border: '1px solid #ccc' }}>
+        <label htmlFor="perfil" style={{ marginBottom: '0.5rem', fontWeight: 'bold' }}>Perfil</label>
+        <select id="perfil" value={perfil} onChange={(e) => setPerfil(e.target.value)} style={{ padding: '0.5rem', marginBottom: '1.5rem', borderRadius: '4px', border: '1px solid #ccc' }}>
           <option value="Aluno">Aluno</option>
           <option value="Professor">Professor / Administrador</option>
         </select>
