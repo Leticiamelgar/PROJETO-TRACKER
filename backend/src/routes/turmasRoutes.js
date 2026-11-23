@@ -56,7 +56,7 @@ router.delete("/:id", async (req, res) => {
     console.error("Erro ao excluir turma:", error);
     
     // Erro 23503 é o código do PostgreSQL para violação de Chave Estrangeira (Foreign Key)
-    if (error.code === '23503') {
+    if (error.code === "23503") {
       return res.status(400).json({ 
         error: "Não é possível excluir esta turma, pois ela já está vinculada a um horário na agenda. Remova a aula da grade primeiro." 
       });
