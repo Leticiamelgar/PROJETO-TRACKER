@@ -1,5 +1,5 @@
 const { Pool } = require("pg");
-require("dotenv").config();
+require("dotenv").config({ quiet: true });
 
 // Inicializa o Pool de conexões com a string do .env
 const pool = new Pool({
