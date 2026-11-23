@@ -1,14 +1,20 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../config/db");
+const { validarLogin } = require("../services/validacaoService");
 
 router.post("/login", async (req, res) => {
   const { email, senha, perfil } = req.body;
 
+  const validacao = validarLogin({ email, senha, perfil });
+  if (!validacao.valido) {
+    return res.status(400).json({ error: validacao.erro });
+  }
+
   try {
     const result = await db.query(
       "SELECT * FROM usuarios WHERE email = $1 AND perfil = $2",
-      [email, perfil],
+      [email, perfil]
     );
 
     if (result.rows.length === 0) {
