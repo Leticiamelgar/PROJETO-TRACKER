@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 import "./DashboardAluno.css";
-import logoGB from "../assets/logo.png";
+import logoGB from "../assets/Logo.png";
 
 export default function GraduacaoAluno() {
   const navigate = useNavigate();
