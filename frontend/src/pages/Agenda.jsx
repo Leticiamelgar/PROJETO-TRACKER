@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
-import logoGB from "../assets/logo.png";
+import logoGB from "../assets/Logo.png";
 import "./Dashboard.css";
 import "./Agenda.css";
 
