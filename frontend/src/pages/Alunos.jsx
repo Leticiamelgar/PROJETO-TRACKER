@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 import "./Dashboard.css";
 import "./Alunos.css";
-import logoGB from "../assets/logo.png";
+import logoGB from "../assets/Logo.png";
 
 export default function Alunos() {
   const navigate = useNavigate();

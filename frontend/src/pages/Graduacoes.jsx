@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 import "./Dashboard.css";
 import "./Graduacoes.css";
-import logoGB from "../assets/logo.png";
+import logoGB from "../assets/Logo.png";
 import iconeLupa from "../assets/busca.png";
 import iconeFiltro from "../assets/filtro.png";
 
